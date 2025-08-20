@@ -1,11 +1,11 @@
 const CACHE_NAME = 'chromatic-tuner-v1.0.0';
 const urlsToCache = [
-  '/',
-  '/index.html',
-  '/manifest.json',
-  '/icon-192.png',
-  '/icon-512.png',
-  '/apple-touch-icon.png'
+  '/tuner-pwa/',
+  '/tuner-pwa/index.html',
+  '/tuner-pwa/manifest.json',
+  '/tuner-pwa/icon-192.png',
+  '/tuner-pwa/icon-512.png',
+  '/tuner-pwa/apple-touch-icon.png'
 ];
 
 // インストール時のキャッシュ
@@ -101,12 +101,13 @@ self.addEventListener('push', (event) => {
     const data = event.data.json();
     const options = {
       body: data.body,
-      icon: '/icon-192.png',
-      badge: '/icon-192.png'
+      icon: '/tuner-pwa/icon-192.png',
+      badge: '/tuner-pwa/icon-192.png'
     };
     event.waitUntil(
       self.registration.showNotification(data.title, options)
     );
   }
 });
+
 
