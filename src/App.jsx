@@ -41,38 +41,37 @@ function App() {
   }
 
   return (
-    <div className="app">
+    <div className={`app ${isListening ? 'is-listening' : ''}`}>
       <header className="app-header">
-        <h1>クロマチックチューナー</h1>
+        <h1>Tuner</h1>
       </header>
       
       <main className="tuner-main">
         {error && (
           <div className="error-message">
-            <p>{error}</p>
+            {error}
           </div>
         )}
         
         <div className="frequency-display">
           <div className="note-display">
             <span className="note">{note || '--'}</span>
-            <span className="cents">{cents > 0 ? `+${cents}` : cents || '0'} cents</span>
+            <span className="cents">{cents > 0 ? `+${cents}` : cents || '0'}</span>
           </div>
           <div className="frequency">
-            {frequency.toFixed(2)} Hz
+            {frequency.toFixed(2)} HZ
           </div>
         </div>
 
         <TuningMeter cents={cents} isListening={isListening} />
 
         <div className="tuner-controls">
-          <Button 
+          <button 
             onClick={handleToggleListening}
-            variant={isListening ? "destructive" : "default"}
-            size="lg"
+            className={isListening ? 'active' : ''}
           >
-            {isListening ? '停止' : '開始'}
-          </Button>
+            {isListening ? 'Stop' : 'Start'}
+          </button>
         </div>
       </main>
       
