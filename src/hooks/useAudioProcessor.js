@@ -23,11 +23,6 @@ export const useAudioProcessor = () => {
     if ('wakeLock' in navigator) {
       try {
         wakeLockRef.current = await navigator.wakeLock.request('screen');
-        console.log('Wake Lock is active');
-        
-        wakeLockRef.current.addEventListener('release', () => {
-          console.log('Wake Lock was released');
-        });
       } catch (err) {
         console.error(`${err.name}, ${err.message}`);
       }
@@ -63,11 +58,15 @@ export const useAudioProcessor = () => {
     return { noteName: '', cents: 0 };
   }, [noteNames]);
 
-  // YINアルゴリズム
+  // YINアルゴリズムによるピッチ検出（低音対応強化版）
   const yinPitchDetection = useCallback((buffer, sampleRate) => {
-    const threshold = 0.15;
-    const bufferSize = Math.min(buffer.length, 2048);
-    const yinBuffer = new Float32Array(bufferSize / 2);
+    // 閾値を下げて低音や弱い信号を拾いやすくする
+    const threshold = 0.10;
+    const bufferSize = buffer.length;
+    // 低音（80Hz以下）をカバーするために十分なラグ（tau）を確保
+    const yinBuffer = new Float32Array(Math.floor(bufferSize / 2));
+
+    // Step 1: Difference function
     for (let tau = 0; tau < yinBuffer.length; tau++) {
       yinBuffer[tau] = 0;
       for (let i = 0; i < yinBuffer.length; i++) {
@@ -75,67 +74,110 @@ export const useAudioProcessor = () => {
         yinBuffer[tau] += delta * delta;
       }
     }
+
+    // Step 2: Cumulative mean normalized difference function
     yinBuffer[0] = 1;
     let runningSum = 0;
     for (let tau = 1; tau < yinBuffer.length; tau++) {
       runningSum += yinBuffer[tau];
       yinBuffer[tau] *= tau / runningSum;
     }
-    for (let tau = 2; tau < yinBuffer.length; tau++) {
-      if (yinBuffer[tau] < threshold) {
-        let betterTau = tau;
-        if (tau + 1 < yinBuffer.length && yinBuffer[tau + 1] < yinBuffer[tau]) {
-          betterTau = tau + 1;
-        }
-        const x0 = betterTau - 1;
-        const x2 = betterTau + 1;
-        if (x0 >= 0 && x2 < yinBuffer.length) {
-          const s0 = yinBuffer[x0];
-          const s1 = yinBuffer[betterTau];
-          const s2 = yinBuffer[x2];
-          const denom = 2 * (2 * s1 - s2 - s0);
-          if (Math.abs(denom) > 0.000001) {
-            betterTau = betterTau + (s2 - s0) / denom;
-          }
-        }
-        return sampleRate / betterTau;
+
+    // Step 3: Absolute threshold
+    let probability = 0;
+    let tau = -1;
+
+    for (let t = 2; t < yinBuffer.length; t++) {
+      if (yinBuffer[t] < threshold) {
+        tau = t;
+        break;
       }
     }
-    return 0;
+
+    // 閾値を下回るものがない場合、最小値を探す
+    if (tau === -1) {
+      let minVal = 1;
+      for (let t = 2; t < yinBuffer.length; t++) {
+        if (yinBuffer[t] < minVal) {
+          minVal = yinBuffer[t];
+          tau = t;
+        }
+      }
+      probability = 1 - minVal;
+    } else {
+      probability = 1 - yinBuffer[tau];
+    }
+
+    // 信頼度が低い場合は0を返す
+    if (tau === -1 || probability < 0.8) return 0;
+
+    // Step 4: Parabolic interpolation
+    let betterTau = tau;
+    const x0 = tau - 1;
+    const x2 = tau + 1;
+    if (x0 >= 0 && x2 < yinBuffer.length) {
+      const s0 = yinBuffer[x0];
+      const s1 = yinBuffer[tau];
+      const s2 = yinBuffer[x2];
+      const denom = 2 * s1 - s2 - s0;
+      if (Math.abs(denom) > 0.000001) {
+        betterTau = tau + (s2 - s0) / (2 * denom);
+      }
+    }
+
+    return sampleRate / betterTau;
   }, []);
 
   const analyzeAudio = useCallback(() => {
-    if (!isListeningRef.current || !analyserRef.current) return;
+    if (!isListeningRef.current || !analyserRef.current || !dataArrayRef.current) return;
+    
     analyserRef.current.getFloatTimeDomainData(dataArrayRef.current);
     const detectedFreq = yinPitchDetection(dataArrayRef.current, audioContextRef.current.sampleRate);
-    if (detectedFreq > 20 && detectedFreq < 4000) {
+    
+    // ギターの低音E(82Hz)から高音までカバー (40Hz〜2000Hz)
+    if (detectedFreq > 40 && detectedFreq < 2000) {
       const { noteName, cents } = frequencyToNote(detectedFreq);
       setFrequency(detectedFreq);
       setNote(noteName);
       setCents(cents);
     }
+
     animationFrameRef.current = requestAnimationFrame(analyzeAudio);
   }, [yinPitchDetection, frequencyToNote]);
 
   const startListening = useCallback(async () => {
     try {
       setError(null);
+      
+      const AudioContextClass = window.AudioContext || window.webkitAudioContext;
       if (!audioContextRef.current) {
-        audioContextRef.current = new (window.AudioContext || window.webkitAudioContext)();
+        audioContextRef.current = new AudioContextClass();
       }
+      
       if (audioContextRef.current.state === 'suspended') {
         await audioContextRef.current.resume();
       }
+      
+      // マイク設定の最適化: オートゲインコントロールを有効にして感度を上げる
       const stream = await navigator.mediaDevices.getUserMedia({ 
-        audio: { echoCancellation: false, noiseSuppression: false, autoGainControl: false } 
+        audio: { 
+          echoCancellation: false, 
+          noiseSuppression: true, 
+          autoGainControl: true 
+        } 
       });
+      
       microphoneRef.current = audioContextRef.current.createMediaStreamSource(stream);
       analyserRef.current = audioContextRef.current.createAnalyser();
-      analyserRef.current.fftSize = 2048;
-      microphoneRef.current.connect(analyserRef.current);
-      dataArrayRef.current = new Float32Array(analyserRef.current.frequencyBinCount);
       
-      // ウェイクロックの要求
+      // fftSizeを4096に増やして低音の解像度を上げる
+      analyserRef.current.fftSize = 4096;
+      
+      microphoneRef.current.connect(analyserRef.current);
+      
+      // dataArrayはfftSizeと同じサイズにする必要がある
+      dataArrayRef.current = new Float32Array(analyserRef.current.fftSize);
+      
       await requestWakeLock();
       
       isListeningRef.current = true;
@@ -153,12 +195,9 @@ export const useAudioProcessor = () => {
     if (animationFrameRef.current) cancelAnimationFrame(animationFrameRef.current);
     if (microphoneRef.current) microphoneRef.current.disconnect();
     if (audioContextRef.current) audioContextRef.current.suspend();
-    
-    // ウェイクロックの解除
     await releaseWakeLock();
   }, [releaseWakeLock]);
 
-  // タブの可視性が変わった時のウェイクロック再取得（ブラウザ仕様への対応）
   useEffect(() => {
     const handleVisibilityChange = async () => {
       if (wakeLockRef.current !== null && document.visibilityState === 'visible' && isListeningRef.current) {
