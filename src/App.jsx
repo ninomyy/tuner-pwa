@@ -17,10 +17,11 @@ function App() {
   } = useAudioProcessor()
 
   useEffect(() => {
-    // Service Workerの登録
+    // Service Workerの登録 (GitHub Pagesのベースパスに対応)
     if ('serviceWorker' in navigator) {
+      const swPath = `${import.meta.env.BASE_URL}sw.js`;
       window.addEventListener('load', () => {
-        navigator.serviceWorker.register('/sw.js')
+        navigator.serviceWorker.register(swPath)
           .then((registration) => {
             console.log('SW registered: ', registration);
           })

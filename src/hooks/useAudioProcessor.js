@@ -1,4 +1,4 @@
-import { useState, useRef, useCallback } from 'react';
+import { useState, useCallback, useRef, useEffect } from 'react';
 
 export const useAudioProcessor = () => {
   const [isListening, setIsListening] = useState(false);
@@ -12,6 +12,7 @@ export const useAudioProcessor = () => {
   const microphoneRef = useRef(null);
   const dataArrayRef = useRef(null);
   const animationFrameRef = useRef(null);
+  const isListeningRef = useRef(false);
 
   // 音名の配列（C0から）
   const noteNames = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'];
@@ -40,10 +41,10 @@ export const useAudioProcessor = () => {
     return { noteName: '', cents: 0 };
   }, [noteNames]);
 
-  // YINアルゴリズムによるピッチ検出（最適化版）
+  // YINアルゴリズムによるピッチ検出
   const yinPitchDetection = useCallback((buffer, sampleRate) => {
-    const threshold = 0.1;
-    const bufferSize = Math.min(buffer.length, 2048); // バッファサイズを制限してパフォーマンス向上
+    const threshold = 0.15; // 閾値を少し上げる
+    const bufferSize = Math.min(buffer.length, 2048);
     const yinBuffer = new Float32Array(bufferSize / 2);
 
     // Step 1: Difference function
@@ -71,110 +72,91 @@ export const useAudioProcessor = () => {
         if (tau + 1 < yinBuffer.length && yinBuffer[tau + 1] < yinBuffer[tau]) {
           betterTau = tau + 1;
         }
-        if (tau - 1 >= 0 && yinBuffer[tau - 1] < yinBuffer[betterTau]) {
-          betterTau = tau - 1;
-        }
         
-        // Parabolic interpolation
         const x0 = betterTau - 1;
         const x2 = betterTau + 1;
         if (x0 >= 0 && x2 < yinBuffer.length) {
-          const a = (yinBuffer[x2] - yinBuffer[x0]) / 2;
-          const b = yinBuffer[x0] - yinBuffer[betterTau];
-          const c = yinBuffer[betterTau];
-          const peak = -b / (2 * a);
-          betterTau = betterTau + peak;
+          const s0 = yinBuffer[x0];
+          const s1 = yinBuffer[betterTau];
+          const s2 = yinBuffer[x2];
+          betterTau = betterTau + (s2 - s0) / (2 * (2 * s1 - s2 - s0));
         }
         
         return sampleRate / betterTau;
       }
     }
     
-    return 0; // No pitch detected
+    return 0;
   }, []);
 
-  // 音声データの分析（最適化版）
+  // 音声データの分析ループ
   const analyzeAudio = useCallback(() => {
-    if (!analyserRef.current || !dataArrayRef.current) return;
+    if (!isListeningRef.current || !analyserRef.current) return;
 
-    const bufferLength = analyserRef.current.frequencyBinCount;
-    const dataArray = new Float32Array(bufferLength);
-    analyserRef.current.getFloatTimeDomainData(dataArray);
-
-    // YINアルゴリズムでピッチを検出
-    const detectedFreq = yinPitchDetection(dataArray, audioContextRef.current.sampleRate);
+    analyserRef.current.getFloatTimeDomainData(dataArrayRef.current);
+    const detectedFreq = yinPitchDetection(dataArrayRef.current, audioContextRef.current.sampleRate);
     
-    if (detectedFreq > 80 && detectedFreq < 2000) { // 有効な周波数範囲
+    if (detectedFreq > 20 && detectedFreq < 4000) { // 範囲を広げる
       const { noteName, cents } = frequencyToNote(detectedFreq);
       setFrequency(detectedFreq);
       setNote(noteName);
       setCents(cents);
     }
 
-    if (isListening) {
-      // パフォーマンス向上のため、フレームレートを調整
-      setTimeout(() => {
-        animationFrameRef.current = requestAnimationFrame(analyzeAudio);
-      }, 50); // 20FPSに制限
-    }
-  }, [isListening, yinPitchDetection, frequencyToNote]);
+    animationFrameRef.current = requestAnimationFrame(analyzeAudio);
+  }, [yinPitchDetection, frequencyToNote]);
 
   // 音声処理開始
   const startListening = useCallback(async () => {
     try {
       setError(null);
+      console.log('Starting audio processing...');
       
-      // iOS Safari対応: ユーザージェスチャー後にAudioContextを作成
-      audioContextRef.current = new (window.AudioContext || window.webkitAudioContext)({
-        sampleRate: 44100, // サンプルレートを明示的に設定
-        latencyHint: 'interactive' // 低レイテンシーを優先
-      });
-      
-      // AudioContextの状態を確認
-      if (audioContextRef.current.state === 'suspended') {
-        await audioContextRef.current.resume();
+      // AudioContextの初期化
+      if (!audioContextRef.current) {
+        audioContextRef.current = new (window.AudioContext || window.webkitAudioContext)();
       }
       
-      // マイクアクセスの要求（iOS Safari対応）
+      // iOS Safari対応: ユーザージェスチャー後に再開
+      if (audioContextRef.current.state === 'suspended') {
+        await audioContextRef.current.resume();
+        console.log('AudioContext resumed');
+      }
+      
       const stream = await navigator.mediaDevices.getUserMedia({ 
         audio: {
           echoCancellation: false,
           noiseSuppression: false,
-          autoGainControl: false,
-          sampleRate: 44100,
-          channelCount: 1
+          autoGainControl: false
         } 
       });
       
+      console.log('Microphone access granted');
+      
       microphoneRef.current = audioContextRef.current.createMediaStreamSource(stream);
       analyserRef.current = audioContextRef.current.createAnalyser();
-      
-      // Analyserの設定（パフォーマンス最適化）
-      analyserRef.current.fftSize = 2048; // サイズを小さくしてパフォーマンス向上
-      analyserRef.current.smoothingTimeConstant = 0.8;
+      analyserRef.current.fftSize = 2048;
       
       microphoneRef.current.connect(analyserRef.current);
+      dataArrayRef.current = new Float32Array(analyserRef.current.frequencyBinCount);
       
-      const bufferLength = analyserRef.current.frequencyBinCount;
-      dataArrayRef.current = new Float32Array(bufferLength);
-      
+      isListeningRef.current = true;
       setIsListening(true);
       analyzeAudio();
       
     } catch (err) {
-      console.error('Error accessing microphone:', err);
+      console.error('Detailed error:', err);
       if (err.name === 'NotAllowedError') {
-        setError('マイクへのアクセスが拒否されました。ブラウザの設定を確認してください。');
-      } else if (err.name === 'NotFoundError') {
-        setError('マイクが見つかりません。デバイスを確認してください。');
+        setError('マイクの使用が許可されていません。ブラウザの設定でマイクを許可してください。');
       } else {
-        setError('音声処理でエラーが発生しました。ページを再読み込みしてください。');
+        setError(`エラーが発生しました: ${err.message}`);
       }
     }
   }, [analyzeAudio]);
 
   // 音声処理停止
   const stopListening = useCallback(() => {
+    isListeningRef.current = false;
     setIsListening(false);
     
     if (animationFrameRef.current) {
@@ -185,14 +167,19 @@ export const useAudioProcessor = () => {
       microphoneRef.current.disconnect();
     }
     
-    if (audioContextRef.current) {
-      audioContextRef.current.close();
+    if (audioContextRef.current && audioContextRef.current.state !== 'closed') {
+      // AudioContextは閉じずに一時停止する方が再開時に安定することがある
+      audioContextRef.current.suspend();
     }
-    
-    // 状態をリセット
-    setFrequency(0);
-    setNote('');
-    setCents(0);
+  }, []);
+
+  // クリーンアップ
+  useEffect(() => {
+    return () => {
+      isListeningRef.current = false;
+      if (animationFrameRef.current) cancelAnimationFrame(animationFrameRef.current);
+      if (audioContextRef.current) audioContextRef.current.close();
+    };
   }, []);
 
   return {
@@ -205,4 +192,3 @@ export const useAudioProcessor = () => {
     stopListening
   };
 };
-
