@@ -1,11 +1,11 @@
-import { useEffect } from 'react'
-import { Button } from '@/components/ui/button.jsx'
+import { useEffect, useState } from 'react'
 import { useAudioProcessor } from './hooks/useAudioProcessor'
 import TuningMeter from './components/TuningMeter'
 import InstallPrompt from './components/InstallPrompt'
 import './App.css'
 
 function App() {
+  const [theme, setTheme] = useState('neon') // 'neon' or 'classic'
   const {
     isListening,
     frequency,
@@ -17,17 +17,12 @@ function App() {
   } = useAudioProcessor()
 
   useEffect(() => {
-    // Service Workerの登録 (GitHub Pagesのベースパスに対応)
     if ('serviceWorker' in navigator) {
       const swPath = `${import.meta.env.BASE_URL}sw.js`;
       window.addEventListener('load', () => {
         navigator.serviceWorker.register(swPath)
-          .then((registration) => {
-            console.log('SW registered: ', registration);
-          })
-          .catch((registrationError) => {
-            console.log('SW registration failed: ', registrationError);
-          });
+          .then((reg) => console.log('SW registered'))
+          .catch((err) => console.log('SW failed', err));
       });
     }
   }, [])
@@ -40,18 +35,24 @@ function App() {
     }
   }
 
+  const toggleTheme = () => {
+    setTheme(prev => prev === 'neon' ? 'classic' : 'neon')
+  }
+
   return (
-    <div className={`app ${isListening ? 'is-listening' : ''}`}>
+    <div className={`app theme-${theme} ${isListening ? 'is-listening' : ''}`}>
+      <div className="theme-switcher">
+        <button onClick={toggleTheme}>
+          {theme === 'neon' ? 'Classic Mode' : 'Neon Mode'}
+        </button>
+      </div>
+
       <header className="app-header">
         <h1>Tuner</h1>
       </header>
       
       <main className="tuner-main">
-        {error && (
-          <div className="error-message">
-            {error}
-          </div>
-        )}
+        {error && <div className="error-message">{error}</div>}
         
         <div className="frequency-display">
           <div className="note-display">
@@ -66,10 +67,7 @@ function App() {
         <TuningMeter cents={cents} isListening={isListening} />
 
         <div className="tuner-controls">
-          <button 
-            onClick={handleToggleListening}
-            className={isListening ? 'active' : ''}
-          >
+          <button onClick={handleToggleListening}>
             {isListening ? 'Stop' : 'Start'}
           </button>
         </div>
