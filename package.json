@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "vite build",
+    "build": "vite build && mv dist/index.source.html dist/index.html && cp dist/index.html index.html && rm -rf assets && cp -r dist/assets assets && cp dist/apple-touch-icon.png dist/favicon.ico dist/icon-192.png dist/icon-512.png dist/manifest.json dist/sw.js .",
     "lint": "eslint .",
     "preview": "vite preview"
   },

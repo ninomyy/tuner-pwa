@@ -7,6 +7,11 @@ import path from 'path'
 export default defineConfig({
   plugins: [react(),tailwindcss()],
   base: '/tuner-pwa/', // GitHub Pagesのサブディレクトリ名
+  build: {
+    rollupOptions: {
+      input: 'index.source.html',
+    },
+  },
   resolve: {
     alias: {
       "@": path.resolve(__dirname, "./src"),

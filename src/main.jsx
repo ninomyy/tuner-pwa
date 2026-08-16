@@ -16,7 +16,7 @@ if (
   (window.location.protocol === 'https:' || window.location.hostname === 'localhost')
 ) {
   window.addEventListener('load', () => {
-    navigator.serviceWorker.register('/tuner-pwa/sw.js')
+    navigator.serviceWorker.register(`${import.meta.env.BASE_URL}sw.js`)
       .then(registration => {
         console.log('Service Worker registered: ', registration);
       })
