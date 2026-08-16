@@ -10,6 +10,7 @@ export const useAudioProcessor = () => {
   const audioContextRef = useRef(null);
   const analyserRef = useRef(null);
   const microphoneRef = useRef(null);
+  const lowPassFilterRef = useRef(null);
   const dataArrayRef = useRef(null);
   const animationFrameRef = useRef(null);
   const isListeningRef = useRef(false);
@@ -58,12 +59,11 @@ export const useAudioProcessor = () => {
     return { noteName: '', cents: 0 };
   }, [noteNames]);
 
-  // YINアルゴリズムによるピッチ検出（低音対応強化版）
+  // YINアルゴリズムによるピッチ検出（ベース対応・超低音最適化版）
   const yinPitchDetection = useCallback((buffer, sampleRate) => {
-    // 閾値を下げて低音や弱い信号を拾いやすくする
-    const threshold = 0.10;
+    // 低音域のために閾値をさらに下げる
+    const threshold = 0.08;
     const bufferSize = buffer.length;
-    // 低音（80Hz以下）をカバーするために十分なラグ（tau）を確保
     const yinBuffer = new Float32Array(Math.floor(bufferSize / 2));
 
     // Step 1: Difference function
@@ -84,9 +84,7 @@ export const useAudioProcessor = () => {
     }
 
     // Step 3: Absolute threshold
-    let probability = 0;
     let tau = -1;
-
     for (let t = 2; t < yinBuffer.length; t++) {
       if (yinBuffer[t] < threshold) {
         tau = t;
@@ -94,7 +92,7 @@ export const useAudioProcessor = () => {
       }
     }
 
-    // 閾値を下回るものがない場合、最小値を探す
+    // 閾値を下回るものがない場合、全体の最小値を探す
     if (tau === -1) {
       let minVal = 1;
       for (let t = 2; t < yinBuffer.length; t++) {
@@ -103,13 +101,8 @@ export const useAudioProcessor = () => {
           tau = t;
         }
       }
-      probability = 1 - minVal;
-    } else {
-      probability = 1 - yinBuffer[tau];
+      if (minVal > 0.3) return 0; // 最小値があまりに高い場合はノイズとみなす
     }
-
-    // 信頼度が低い場合は0を返す
-    if (tau === -1 || probability < 0.8) return 0;
 
     // Step 4: Parabolic interpolation
     let betterTau = tau;
@@ -134,8 +127,8 @@ export const useAudioProcessor = () => {
     analyserRef.current.getFloatTimeDomainData(dataArrayRef.current);
     const detectedFreq = yinPitchDetection(dataArrayRef.current, audioContextRef.current.sampleRate);
     
-    // ギターの低音E(82Hz)から高音までカバー (40Hz〜2000Hz)
-    if (detectedFreq > 40 && detectedFreq < 2000) {
+    // ベースの低音E(約41Hz)からカバー (30Hz〜1000Hzにフォーカス)
+    if (detectedFreq > 30 && detectedFreq < 1000) {
       const { noteName, cents } = frequencyToNote(detectedFreq);
       setFrequency(detectedFreq);
       setNote(noteName);
@@ -158,24 +151,32 @@ export const useAudioProcessor = () => {
         await audioContextRef.current.resume();
       }
       
-      // マイク設定の最適化: オートゲインコントロールを有効にして感度を上げる
       const stream = await navigator.mediaDevices.getUserMedia({ 
         audio: { 
           echoCancellation: false, 
-          noiseSuppression: true, 
+          noiseSuppression: false, 
           autoGainControl: true 
         } 
       });
       
       microphoneRef.current = audioContextRef.current.createMediaStreamSource(stream);
+      
+      // 【改善】ローパスフィルタの導入
+      // ベースの倍音（高い音）をカットし、基音（低い音）を際立たせる
+      lowPassFilterRef.current = audioContextRef.current.createBiquadFilter();
+      lowPassFilterRef.current.type = 'lowpass';
+      lowPassFilterRef.current.frequency.setValueAtTime(300, audioContextRef.current.currentTime);
+      lowPassFilterRef.current.Q.setValueAtTime(1, audioContextRef.current.currentTime);
+      
       analyserRef.current = audioContextRef.current.createAnalyser();
       
-      // fftSizeを4096に増やして低音の解像度を上げる
-      analyserRef.current.fftSize = 4096;
+      // 【改善】fftSizeを8192に増やして低音の解像度を最大化
+      analyserRef.current.fftSize = 8192;
       
-      microphoneRef.current.connect(analyserRef.current);
+      // 接続: マイク -> フィルタ -> アナライザ
+      microphoneRef.current.connect(lowPassFilterRef.current);
+      lowPassFilterRef.current.connect(analyserRef.current);
       
-      // dataArrayはfftSizeと同じサイズにする必要がある
       dataArrayRef.current = new Float32Array(analyserRef.current.fftSize);
       
       await requestWakeLock();
@@ -194,6 +195,7 @@ export const useAudioProcessor = () => {
     setIsListening(false);
     if (animationFrameRef.current) cancelAnimationFrame(animationFrameRef.current);
     if (microphoneRef.current) microphoneRef.current.disconnect();
+    if (lowPassFilterRef.current) lowPassFilterRef.current.disconnect();
     if (audioContextRef.current) audioContextRef.current.suspend();
     await releaseWakeLock();
   }, [releaseWakeLock]);
