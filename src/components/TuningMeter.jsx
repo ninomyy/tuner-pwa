@@ -12,7 +12,7 @@ const TuningMeter = ({ cents, isListening }) => {
         <div className="center-line"></div>
         
         {/* スケールラベル */}
-        {[-50, 0, 50].map((value) => (
+        {[-50, -25, 0, 25, 50].map((value) => (
           <div 
             key={value} 
             className="scale-mark" 
@@ -34,6 +34,11 @@ const TuningMeter = ({ cents, isListening }) => {
             }}
           ></div>
         )}
+      </div>
+      
+      {/* クラシックテーマ用の正確性インジケーター (赤い丸) */}
+      <div className="accuracy-indicator">
+        <div className="accuracy-light"></div>
       </div>
     </div>
   );

@@ -5,7 +5,7 @@ import InstallPrompt from './components/InstallPrompt'
 import './App.css'
 
 function App() {
-  const [theme, setTheme] = useState('psychedelic')
+  const [theme, setTheme] = useState('classic') // デフォルトをクラシックに変更
   const {
     isListening,
     frequency,
@@ -37,29 +37,19 @@ function App() {
 
   const nextTheme = () => {
     setTheme(prev => {
+      if (prev === 'classic') return 'psychedelic';
       if (prev === 'psychedelic') return 'neon';
-      if (prev === 'neon') return 'classic';
-      return 'psychedelic';
+      return 'classic';
     });
   }
 
   return (
     <div className={`app theme-${theme} ${isListening ? 'is-listening' : ''}`}>
-      {/* うねうね背景を実現するためのSVGフィルター */}
+      {/* サイケデリック背景用SVGフィルター (PSYCHEDELICテーマ時のみ有効) */}
       <svg style={{ position: 'absolute', width: 0, height: 0 }}>
         <filter id="wavy">
-          <feTurbulence 
-            type="fractalNoise" 
-            baseFrequency="0.01" 
-            numOctaves="3" 
-            seed="2"
-          >
-            <animate 
-              attributeName="baseFrequency" 
-              values="0.01;0.02;0.01" 
-              dur="30s" 
-              repeatCount="indefinite" 
-            />
+          <feTurbulence type="fractalNoise" baseFrequency="0.01" numOctaves="3" seed="2">
+            <animate attributeName="baseFrequency" values="0.01;0.02;0.01" dur="30s" repeatCount="indefinite" />
           </feTurbulence>
           <feDisplacementMap in="SourceGraphic" scale="60" />
         </filter>
@@ -69,12 +59,12 @@ function App() {
 
       <div className="theme-switcher">
         <button onClick={nextTheme}>
-          {theme.toUpperCase()}
+          {theme === 'classic' ? 'モード切替' : `Theme: ${theme.toUpperCase()}`}
         </button>
       </div>
 
       <header className="app-header">
-        <h1>TUNER</h1>
+        <h1>{theme === 'classic' ? 'クロマチックチューナー' : 'TUNER'}</h1>
       </header>
       
       <main className="tuner-main">
@@ -83,10 +73,10 @@ function App() {
         <div className="frequency-display">
           <div className="note-display">
             <span className="note">{note || '--'}</span>
-            <span className="cents">{cents > 0 ? `+${cents}` : cents || '0'}</span>
+            <span className="cents">{cents > 0 ? `+${cents}` : cents || '0'} cents</span>
           </div>
           <div className="frequency">
-            {frequency.toFixed(2)} HZ
+            {frequency.toFixed(2)} Hz
           </div>
         </div>
 
@@ -97,7 +87,7 @@ function App() {
             onClick={handleToggleListening}
             className={isListening ? 'active' : ''}
           >
-            {isListening ? 'STOP' : 'START'}
+            {isListening ? '停止' : '開始'}
           </button>
         </div>
       </main>

@@ -30,26 +30,9 @@ body {
   position: fixed;
   width: 100%;
   height: 100%;
-  background: var(--psy-navy);
-  font-family: 'Arial Black', sans-serif;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
   -webkit-user-select: none;
   user-select: none;
-}
-
-/* うねうね背景層 */
-.psy-bg {
-  position: absolute;
-  top: -20%; left: -20%; width: 140%; height: 140%;
-  background: 
-    radial-gradient(circle at 20% 20%, var(--psy-orange) 0%, transparent 40%),
-    radial-gradient(circle at 80% 20%, var(--psy-blue) 0%, transparent 40%),
-    radial-gradient(circle at 20% 80%, var(--psy-red) 0%, transparent 40%),
-    radial-gradient(circle at 80% 80%, var(--psy-cream) 0%, transparent 40%),
-    radial-gradient(circle at 50% 50%, var(--psy-navy) 0%, transparent 60%);
-  filter: url(#wavy); /* SVGフィルタでうねうねさせる */
-  animation: wave-flow 15s ease-in-out infinite alternate;
-  opacity: 0.8;
-  z-index: -2;
 }
 
 .app {
@@ -61,20 +44,7 @@ body {
   padding: env(safe-area-inset-top) 20px env(safe-area-inset-bottom);
   box-sizing: border-box;
   position: relative;
-}
-
-.app-header {
-  padding-top: 20px;
-  z-index: 10;
-}
-
-.app-header h1 {
-  font-size: 1.2rem;
-  letter-spacing: 5px;
-  color: var(--psy-cream);
-  text-transform: uppercase;
-  margin: 0;
-  text-shadow: 2px 2px 0 var(--psy-navy);
+  transition: background 0.3s ease;
 }
 
 .tuner-main {
@@ -84,137 +54,163 @@ body {
   align-items: center;
   justify-content: center;
   width: 100%;
-  max-width: 400px;
+  max-width: 450px;
   gap: 30px;
   z-index: 10;
 }
 
-/* メインディスプレイ */
-.frequency-display {
-  position: relative;
-  width: 260px;
-  height: 260px;
+/* --- テーマ1: PSYCHEDELIC (うねうね) --- */
+.theme-psychedelic { background: var(--psy-navy); }
+.theme-psychedelic .psy-bg {
+  position: absolute; top: -20%; left: -20%; width: 140%; height: 140%;
+  background: 
+    radial-gradient(circle at 20% 20%, var(--psy-orange) 0%, transparent 40%),
+    radial-gradient(circle at 80% 20%, var(--psy-blue) 0%, transparent 40%),
+    radial-gradient(circle at 20% 80%, var(--psy-red) 0%, transparent 40%),
+    radial-gradient(circle at 80% 80%, var(--psy-cream) 0%, transparent 40%);
+  filter: url(#wavy);
+  animation: wave-flow 15s ease-in-out infinite alternate;
+  opacity: 0.8; z-index: -2;
+}
+
+.theme-psychedelic .app-header h1 {
+  font-size: 1.2rem; letter-spacing: 5px; color: var(--psy-cream); text-transform: uppercase;
+}
+
+.theme-psychedelic .frequency-display {
+  width: 260px; height: 260px; background: rgba(27, 38, 59, 0.7);
+  border: 4px solid var(--psy-cream); animation: morph-blob 8s ease-in-out infinite;
+  box-shadow: 10px 10px 0 var(--psy-orange), -5px -5px 0 var(--psy-blue);
+}
+
+.theme-psychedelic .note { font-size: 6rem; color: var(--psy-cream); text-shadow: 4px 4px 0 var(--psy-navy); }
+.theme-psychedelic .cents { color: var(--psy-orange); }
+.theme-psychedelic .frequency { color: var(--psy-blue); }
+
+.theme-psychedelic .tuner-controls button {
+  background: var(--psy-cream); color: var(--psy-navy); padding: 15px 50px; font-weight: 900;
+  box-shadow: 8px 8px 0 var(--psy-orange); text-transform: uppercase;
+}
+
+/* --- テーマ2: CLASSIC (ユーザー提供画像再現) --- */
+.theme-classic { background: #ffffff; }
+
+.theme-classic .app-header h1 {
+  font-size: 2.5rem;
+  color: #c07b92;
+  font-weight: bold;
+  text-shadow: 0 0 10px rgba(192, 123, 146, 0.2);
+  margin-bottom: 10px;
+}
+
+.theme-classic .frequency-display {
+  width: 100%;
+  max-width: 380px;
+  height: 200px;
+  background: linear-gradient(to bottom right, #fdf2f8, #f5f3ff);
+  border-radius: 20px;
+  box-shadow: 0 10px 25px rgba(0,0,0,0.05);
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  background: rgba(27, 38, 59, 0.7);
-  backdrop-filter: blur(5px);
-  border: 4px solid var(--psy-cream);
-  animation: morph-blob 8s ease-in-out infinite;
-  box-shadow: 10px 10px 0 var(--psy-orange), -5px -5px 0 var(--psy-blue);
+  border: 1px solid rgba(0,0,0,0.05);
 }
 
-.note {
-  font-size: 6rem;
-  font-weight: 900;
-  color: var(--psy-cream);
-  line-height: 1;
-  text-shadow: 4px 4px 0 var(--psy-navy);
+.theme-classic .note {
+  font-size: 5rem;
+  font-weight: 800;
+  color: #7a9a8f; /* 画像のグリーンの色味 */
+  text-shadow: 0 2px 4px rgba(0,0,0,0.1);
 }
 
-.cents {
-  font-size: 1.5rem;
-  color: var(--psy-orange);
-  text-shadow: 2px 2px 0 var(--psy-navy);
-  margin-top: 5px;
+.theme-classic .cents {
+  font-size: 1rem;
+  color: #f59e0b; /* オレンジ */
+  font-weight: 600;
 }
 
-.frequency {
-  position: absolute;
-  bottom: 30px;
-  font-family: monospace;
-  color: var(--psy-blue);
-  font-size: 0.9rem;
-  letter-spacing: 1px;
+.theme-classic .frequency {
+  position: static;
+  margin-top: 10px;
+  font-size: 1.1rem;
+  color: #3b82f6; /* ブルー */
+  font-weight: 700;
+  letter-spacing: 0;
 }
 
-/* メーター */
-.tuning-meter {
-  width: 100%;
-  padding: 0 10px;
-}
+.theme-classic .tuning-meter { width: 100%; padding: 20px 0; }
 
-.meter-container {
-  position: relative;
-  height: 50px;
-  background: var(--psy-navy);
-  border: 3px solid var(--psy-cream);
-  overflow: hidden;
-  display: flex;
-  align-items: center;
-}
-
-.meter-track {
-  width: 100%; height: 100%;
-  background: repeating-linear-gradient(90deg, 
-    var(--psy-orange) 0, var(--psy-orange) 20%, 
-    var(--psy-blue) 20%, var(--psy-blue) 40%, 
-    var(--psy-red) 40%, var(--psy-red) 60%, 
-    var(--psy-cream) 60%, var(--psy-cream) 80%);
-  opacity: 0.3;
-}
-
-.meter-indicator {
-  position: absolute;
-  top: 0;
-  width: 8px;
-  height: 100%;
-  background: var(--psy-cream);
-  box-shadow: 0 0 15px var(--psy-cream);
-  z-index: 5;
-  transition: left 0.1s ease-out;
-}
-
-.center-line {
-  position: absolute;
-  left: 50%;
-  width: 4px;
-  height: 100%;
-  background: var(--psy-cream);
-  opacity: 0.5;
-  z-index: 2;
-}
-
-/* コントロール */
-.tuner-controls {
-  padding-bottom: 40px;
-}
-
-.tuner-controls button {
-  background: var(--psy-cream);
-  color: var(--psy-navy);
+.theme-classic .meter-container {
+  height: 12px;
+  background: linear-gradient(90deg, #ef4444, #f59e0b, #10b981, #f59e0b, #ef4444);
+  border-radius: 6px;
   border: none;
-  padding: 15px 50px;
-  font-size: 1.4rem;
-  font-weight: 900;
-  border-radius: 0;
-  letter-spacing: 3px;
-  box-shadow: 8px 8px 0 var(--psy-orange);
-  transition: 0.2s;
-  text-transform: uppercase;
+  overflow: visible;
 }
 
-.tuner-controls button.active {
-  background: var(--psy-red);
+.theme-classic .meter-indicator {
+  width: 3px;
+  height: 30px;
+  background: #ef4444;
+  box-shadow: 0 0 5px rgba(239, 68, 68, 0.5);
+  top: 50%;
+  transform: translate(-50%, -50%);
+  border-radius: 2px;
+}
+
+.theme-classic .center-line {
+  width: 2px;
+  height: 15px;
+  background: #d1d5db;
+  top: -15px;
+}
+
+.theme-classic .scale-label {
+  color: #9ca3af;
+  top: -25px;
+  font-weight: bold;
+}
+
+.theme-classic .accuracy-indicator {
+  margin-top: 15px;
+  display: flex;
+  justify-content: center;
+}
+
+.theme-classic .accuracy-light {
+  width: 15px;
+  height: 15px;
+  background: #ef4444;
+  border-radius: 50%;
+  box-shadow: 0 0 10px rgba(239, 68, 68, 0.3);
+}
+
+.theme-classic .tuner-controls button {
+  background: #ef4444;
   color: white;
-  box-shadow: 8px 8px 0 var(--psy-blue);
+  padding: 10px 35px;
+  border-radius: 25px;
+  font-size: 1.2rem;
+  font-weight: bold;
+  box-shadow: 0 4px 15px rgba(239, 68, 68, 0.3);
 }
 
-.is-listening .psy-bg {
-  animation-duration: 5s;
-  opacity: 1;
+/* --- テーマ3: NEON --- */
+.theme-neon { background: #000; }
+.theme-neon .frequency-display {
+  width: 240px; height: 240px; border-radius: 50%; background: rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(20px); border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 0 0 40px rgba(255, 0, 255, 0.2);
 }
+.theme-neon .note { animation: rainbow-text 4s linear infinite; }
 
-.theme-switcher {
-  position: absolute;
-  top: 20px; right: 20px; z-index: 20;
-}
-
+/* --- 共通コントロール --- */
+.theme-switcher { position: absolute; top: 20px; right: 20px; z-index: 100; }
 .theme-switcher button {
-  background: rgba(255, 255, 255, 0.2);
-  border: 1px solid var(--psy-cream);
-  color: var(--psy-cream);
-  padding: 5px 10px;
-  font-size: 0.6rem;
+  background: rgba(128, 128, 128, 0.1); border: 1px solid rgba(128, 128, 128, 0.2);
+  color: #666; padding: 5px 12px; border-radius: 15px; font-size: 0.7rem;
 }
+.theme-psychedelic .theme-switcher button { color: white; border-color: white; }
+
+.error-message { color: #ef4444; font-size: 0.8rem; text-align: center; }
