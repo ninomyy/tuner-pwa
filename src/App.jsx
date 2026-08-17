@@ -56,17 +56,19 @@ function App() {
 
       <div className="psy-bg"></div>
 
-      <div className="theme-switcher">
-        <button onClick={nextTheme}>
-          {theme === 'classic' ? 'モード切替' : `Theme: ${theme.toUpperCase()}`}
-        </button>
-      </div>
-
       <main className="tuner-main">
-        {/* タイトルをメインエリアのトップに配置 */}
-        <header className="app-header">
-          <h1>{theme === 'classic' ? 'クロマチックチューナー' : 'TUNER'}</h1>
-        </header>
+        {/* タイトルとモード切替を一つのコンテナにまとめてボックスの直上に配置 */}
+        <div className="top-controls">
+          <header className="app-header">
+            <h1>{theme === 'classic' ? 'クロマチックチューナー' : 'TUNER'}</h1>
+          </header>
+          
+          <div className="theme-switcher-inline">
+            <button onClick={nextTheme}>
+              {theme === 'classic' ? 'モード切替' : `Theme: ${theme.toUpperCase()}`}
+            </button>
+          </div>
+        </div>
 
         {error && <div className="error-message">{error}</div>}
         
