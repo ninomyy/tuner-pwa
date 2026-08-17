@@ -9,13 +9,6 @@
 }
 
 /* --- アニメーション定義 --- */
-@keyframes wave-flow {
-  0% { transform: translate(0, 0) rotate(0deg) scale(1); }
-  33% { transform: translate(2%, 2%) rotate(2deg) scale(1.05); }
-  66% { transform: translate(-2%, 1%) rotate(-2deg) scale(0.95); }
-  100% { transform: translate(0, 0) rotate(0deg) scale(1); }
-}
-
 @keyframes morph-blob {
   0% { border-radius: 40% 60% 60% 40% / 40% 40% 60% 60%; }
   50% { border-radius: 60% 40% 40% 60% / 60% 60% 40% 40%; }
@@ -47,7 +40,7 @@ body {
   width: 100%; max-width: 450px; gap: 15px; z-index: 10;
 }
 
-/* --- 上部コントロール（タイトルと切替ボタン） --- */
+/* --- 上部コントロール --- */
 .top-controls {
   width: 100%; display: flex; flex-direction: column; align-items: center; gap: 10px;
   margin-bottom: 5px;
@@ -56,38 +49,38 @@ body {
 .app-header h1 { margin: 0; text-align: center; }
 
 .theme-switcher-inline button {
-  background: rgba(128, 128, 128, 0.1); border: 1px solid rgba(128, 128, 128, 0.2);
-  color: #888; padding: 5px 15px; border-radius: 20px; font-size: 0.7rem;
+  background: rgba(128, 128, 128, 0.15); border: 1px solid rgba(128, 128, 128, 0.3);
+  color: #666; padding: 5px 15px; border-radius: 20px; font-size: 0.7rem;
   backdrop-filter: blur(5px); transition: all 0.2s;
 }
 
 /* --- テーマ別スタイル --- */
 
-/* PSYCHEDELIC */
-.theme-psychedelic { background: var(--psy-navy); }
+/* PSYCHEDELIC (静止画背景) */
+.theme-psychedelic { background: #000; }
 .theme-psychedelic .psy-bg {
-  position: absolute; top: -20%; left: -20%; width: 140%; height: 140%;
-  background: radial-gradient(circle at 20% 20%, var(--psy-orange) 0%, transparent 40%),
-              radial-gradient(circle at 80% 20%, var(--psy-blue) 0%, transparent 40%),
-              radial-gradient(circle at 20% 80%, var(--psy-red) 0%, transparent 40%),
-              radial-gradient(circle at 80% 80%, var(--psy-cream) 0%, transparent 40%);
-  filter: url(#wavy); animation: wave-flow 15s ease-in-out infinite alternate;
-  opacity: 0.8; z-index: -2;
+  position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+  background-image: url('/tuner-pwa/psychedelic-bg.png');
+  background-size: cover;
+  background-position: center;
+  opacity: 1; z-index: -2;
 }
-.theme-psychedelic .app-header h1 { font-size: 1.1rem; letter-spacing: 4px; color: var(--psy-cream); text-transform: uppercase; }
-.theme-psychedelic .theme-switcher-inline button { color: var(--psy-cream); border-color: var(--psy-cream); }
+.theme-psychedelic .app-header h1 { 
+  font-size: 1.1rem; letter-spacing: 4px; color: #fff; text-transform: uppercase;
+  text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+}
+.theme-psychedelic .theme-switcher-inline button { color: #fff; border-color: rgba(255,255,255,0.5); background: rgba(0,0,0,0.3); }
 .theme-psychedelic .frequency-display {
-  width: min(70vw, 260px); aspect-ratio: 1/1; background: rgba(27, 38, 59, 0.7);
-  border: 4px solid var(--psy-cream); animation: morph-blob 8s ease-in-out infinite;
-  box-shadow: 10px 10px 0 var(--psy-orange), -5px -5px 0 var(--psy-blue);
-  display: flex; flex-direction: column; align-items: center; justify-content: center; position: relative;
+  width: min(70vw, 260px); aspect-ratio: 1/1; background: rgba(0, 0, 0, 0.6);
+  border: 2px solid rgba(255, 255, 255, 0.2); backdrop-filter: blur(10px);
+  border-radius: 50%; display: flex; flex-direction: column; align-items: center; justify-content: center; position: relative;
 }
-.theme-psychedelic .note { font-size: 5rem; color: var(--psy-cream); text-shadow: 4px 4px 0 var(--psy-navy); }
-.theme-psychedelic .cents { color: var(--psy-orange); font-size: 1.2rem; }
+.theme-psychedelic .note { font-size: 5rem; color: #fff; text-shadow: 0 0 20px rgba(255,255,255,0.5); }
+.theme-psychedelic .cents { color: var(--psy-yellow); font-size: 1.2rem; }
 .theme-psychedelic .frequency { color: var(--psy-blue); position: absolute; bottom: 20px; font-size: 0.8rem; }
 .theme-psychedelic .tuner-controls button {
-  background: var(--psy-cream); color: var(--psy-navy); padding: 12px 40px; font-weight: 900;
-  box-shadow: 6px 6px 0 var(--psy-orange); text-transform: uppercase; border: none; margin-top: 15px;
+  background: #fff; color: #000; padding: 12px 40px; font-weight: 900;
+  border-radius: 30px; box-shadow: 0 4px 15px rgba(0,0,0,0.3); text-transform: uppercase; border: none; margin-top: 15px;
 }
 
 /* CLASSIC */
@@ -129,14 +122,15 @@ body {
 .meter-container { position: relative; width: 100%; height: 50px; display: flex; align-items: center; }
 
 .theme-psychedelic .meter-container, .theme-neon .meter-container {
-  height: 40px; background: rgba(255, 255, 255, 0.05); border-radius: 20px; border: 1px solid rgba(255, 255, 255, 0.1); overflow: hidden;
+  height: 40px; background: rgba(255, 255, 255, 0.1); border-radius: 20px; border: 1px solid rgba(255, 255, 255, 0.1); overflow: hidden;
 }
 .theme-classic .meter-container {
   height: 10px; background: linear-gradient(90deg, #ef4444, #f59e0b, #10b981, #f59e0b, #ef4444); border-radius: 5px; overflow: visible;
 }
 
 .meter-track { width: 100%; height: 100%; opacity: 0.2; }
-.theme-psychedelic .meter-track { background: linear-gradient(90deg, var(--psy-pink), var(--psy-purple), var(--psy-cyan), var(--psy-green), var(--psy-yellow)); }
+.theme-psychedelic .meter-track { background: linear-gradient(90deg, #fff, #ccc); }
+.theme-neon .meter-track { background: linear-gradient(90deg, var(--psy-pink), var(--psy-purple), var(--psy-cyan), var(--psy-green), var(--psy-yellow)); }
 
 .meter-indicator { position: absolute; width: 4px; height: 100%; background: #fff; z-index: 5; transition: left 0.1s ease-out; }
 .theme-classic .meter-indicator { width: 4px; height: 30px; background: #ef4444; top: 50%; transform: translate(-50%, -50%); border-radius: 2px; }

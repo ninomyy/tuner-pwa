@@ -5,7 +5,7 @@ import InstallPrompt from './components/InstallPrompt'
 import './App.css'
 
 function App() {
-  const [theme, setTheme] = useState('classic')
+  const [theme, setTheme] = useState('psychedelic') // 静止画サイケをデフォルトに設定
   const {
     isListening,
     frequency,
@@ -37,27 +37,18 @@ function App() {
 
   const nextTheme = () => {
     setTheme(prev => {
-      if (prev === 'classic') return 'psychedelic';
       if (prev === 'psychedelic') return 'neon';
-      return 'classic';
+      if (prev === 'neon') return 'classic';
+      return 'psychedelic';
     });
   }
 
   return (
     <div className={`app theme-${theme} ${isListening ? 'is-listening' : ''}`}>
-      <svg style={{ position: 'absolute', width: 0, height: 0 }}>
-        <filter id="wavy">
-          <feTurbulence type="fractalNoise" baseFrequency="0.01" numOctaves="3" seed="2">
-            <animate attributeName="baseFrequency" values="0.01;0.02;0.01" dur="30s" repeatCount="indefinite" />
-          </feTurbulence>
-          <feDisplacementMap in="SourceGraphic" scale="60" />
-        </filter>
-      </svg>
-
+      {/* 背景画像用のコンテナ */}
       <div className="psy-bg"></div>
 
       <main className="tuner-main">
-        {/* タイトルとモード切替を一つのコンテナにまとめてボックスの直上に配置 */}
         <div className="top-controls">
           <header className="app-header">
             <h1>{theme === 'classic' ? 'クロマチックチューナー' : 'TUNER'}</h1>
