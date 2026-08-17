@@ -61,7 +61,7 @@ body {
 
 /* PSYCHEDELIC (静止画背景) */
 .theme-psychedelic { 
-  background-image: url('./psychedelic-bg.png'); 
+  background-image: url('../psychedelic-bg.png'); /* パスを修正 */
   background-color: #000;
 }
 .theme-psychedelic .app-header h1 { 
