@@ -70,7 +70,7 @@ body {
   backdrop-filter: blur(5px); transition: all 0.2s;
 }
 
-.sound-toggle.on {
+.haptic-toggle.on {
   color: var(--in-tune-green);
   border-color: var(--in-tune-green);
   background: rgba(0, 255, 136, 0.1);
@@ -105,7 +105,7 @@ body {
   text-shadow: 2px 2px 4px rgba(0,0,0,0.8);
 }
 .theme-psychedelic .theme-switcher-inline button { color: #fff; border-color: rgba(255,255,255,0.5); background: rgba(0,0,0,0.4); }
-.theme-psychedelic .sound-toggle.on { color: var(--in-tune-green); border-color: var(--in-tune-green); }
+.theme-psychedelic .haptic-toggle.on { color: var(--in-tune-green); border-color: var(--in-tune-green); }
 .theme-psychedelic .frequency-display {
   width: min(75vw, 280px); aspect-ratio: 1/1; background: rgba(0, 0, 0, 0.7);
   border: 2px solid rgba(255, 255, 255, 0.3); backdrop-filter: blur(12px);
@@ -152,7 +152,7 @@ body {
 }
 .theme-neon .app-header h1 { color: #ff00ff; font-size: 1.4rem; letter-spacing: 3px; text-shadow: 0 0 10px #ff00ff; }
 .theme-neon .theme-switcher-inline button { color: #ff00ff; border-color: #ff00ff; background: rgba(0,0,0,0.5); }
-.theme-neon .sound-toggle.on { color: var(--in-tune-green); border-color: var(--in-tune-green); box-shadow: 0 0 10px var(--in-tune-green); }
+.theme-neon .haptic-toggle.on { color: var(--in-tune-green); border-color: var(--in-tune-green); box-shadow: 0 0 10px var(--in-tune-green); }
 .theme-neon .frequency-display {
   width: min(70vw, 240px); aspect-ratio: 1/1; border-radius: 50%; background: rgba(0, 0, 0, 0.6);
   backdrop-filter: blur(15px); border: 2px solid #ff00ff;

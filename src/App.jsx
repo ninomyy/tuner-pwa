@@ -9,8 +9,8 @@ function App() {
     return localStorage.getItem('tuner-theme') || 'classic';
   })
   
-  const [soundEnabled, setSoundEnabled] = useState(() => {
-    return localStorage.getItem('tuner-sound') === 'true';
+  const [hapticEnabled, setHapticEnabled] = useState(() => {
+    return localStorage.getItem('tuner-haptic') === 'true';
   })
 
   const {
@@ -23,30 +23,29 @@ function App() {
     stopListening
   } = useAudioProcessor()
 
-  const audioRef = useRef(null);
   const lastInTuneRef = useRef(false);
 
   // チューニングが合っているか判定 (±3セント以内)
   const isInTune = isListening && Math.abs(cents) <= 3 && note !== '';
 
-  // 音声再生ロジック
+  // 触覚フィードバック (バイブレーション) ロジック
   useEffect(() => {
-    if (soundEnabled && isInTune && !lastInTuneRef.current) {
-      if (audioRef.current) {
-        audioRef.current.currentTime = 0;
-        audioRef.current.play().catch(e => console.log("Audio play failed:", e));
+    if (hapticEnabled && isInTune && !lastInTuneRef.current) {
+      if ('vibrate' in navigator) {
+        // 短い振動 (50ms)
+        navigator.vibrate(50);
       }
     }
     lastInTuneRef.current = isInTune;
-  }, [isInTune, soundEnabled]);
+  }, [isInTune, hapticEnabled]);
 
   useEffect(() => {
     localStorage.setItem('tuner-theme', theme);
   }, [theme])
 
   useEffect(() => {
-    localStorage.setItem('tuner-sound', soundEnabled);
-  }, [soundEnabled])
+    localStorage.setItem('tuner-haptic', hapticEnabled);
+  }, [hapticEnabled])
 
   useEffect(() => {
     if ('serviceWorker' in navigator) {
@@ -75,17 +74,14 @@ function App() {
     });
   }
 
-  const toggleSound = () => {
-    setSoundEnabled(!soundEnabled);
+  const toggleHaptic = () => {
+    setHapticEnabled(!hapticEnabled);
   }
 
   return (
     <div className={`app theme-${theme} ${isListening ? 'is-listening' : ''} ${isInTune ? 'is-in-tune' : ''}`}>
       <div className="psy-bg"></div>
       
-      {/* 効果音用オーディオ要素 */}
-      <audio ref={audioRef} src={`${import.meta.env.BASE_URL}success.mp3`} preload="auto" />
-
       <main className="tuner-main">
         <div className="top-controls">
           <header className="app-header">
@@ -97,10 +93,10 @@ function App() {
               {theme === 'classic' ? 'モード切替' : `Theme: ${theme.toUpperCase()}`}
             </button>
             <button 
-              onClick={toggleSound} 
-              className={`sound-toggle ${soundEnabled ? 'on' : 'off'}`}
+              onClick={toggleHaptic} 
+              className={`haptic-toggle ${hapticEnabled ? 'on' : 'off'}`}
             >
-              {soundEnabled ? '🔔 音: ON' : '🔕 音: OFF'}
+              {hapticEnabled ? '📳 振動: ON' : '📴 振動: OFF'}
             </button>
           </div>
         </div>
