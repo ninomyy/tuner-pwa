@@ -1,6 +1,6 @@
 import React from 'react';
 
-const TuningMeter = ({ cents, isListening }) => {
+const TuningMeter = ({ cents, isListening, isInTune }) => {
   // セント値を-50から+50の範囲で正規化
   const normalizedCents = Math.max(-50, Math.min(50, cents));
   const meterPosition = ((normalizedCents + 50) / 100) * 100; // 0-100%
@@ -36,9 +36,9 @@ const TuningMeter = ({ cents, isListening }) => {
         )}
       </div>
       
-      {/* クラシックテーマ用の正確性インジケーター (赤い丸) */}
+      {/* 正確性インジケーター (isInTune の状態で色が変わる) */}
       <div className="accuracy-indicator">
-        <div className="accuracy-light"></div>
+        <div className={`accuracy-light ${isInTune ? 'active' : ''}`}></div>
       </div>
     </div>
   );

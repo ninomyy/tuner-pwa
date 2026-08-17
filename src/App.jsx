@@ -5,7 +5,6 @@ import InstallPrompt from './components/InstallPrompt'
 import './App.css'
 
 function App() {
-  // 初期状態を localStorage から取得、なければ 'classic'
   const [theme, setTheme] = useState(() => {
     return localStorage.getItem('tuner-theme') || 'classic';
   })
@@ -20,7 +19,9 @@ function App() {
     stopListening
   } = useAudioProcessor()
 
-  // テーマが変更されるたびに localStorage に保存
+  // チューニングが合っているか判定 (±3セント以内)
+  const isInTune = isListening && Math.abs(cents) <= 3 && note !== '';
+
   useEffect(() => {
     localStorage.setItem('tuner-theme', theme);
   }, [theme])
@@ -53,7 +54,7 @@ function App() {
   }
 
   return (
-    <div className={`app theme-${theme} ${isListening ? 'is-listening' : ''}`}>
+    <div className={`app theme-${theme} ${isListening ? 'is-listening' : ''} ${isInTune ? 'is-in-tune' : ''}`}>
       <div className="psy-bg"></div>
 
       <main className="tuner-main">
@@ -81,7 +82,7 @@ function App() {
           </div>
         </div>
 
-        <TuningMeter cents={cents} isListening={isListening} />
+        <TuningMeter cents={cents} isListening={isListening} isInTune={isInTune} />
 
         <div className="tuner-controls">
           <button 

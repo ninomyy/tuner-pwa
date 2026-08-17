@@ -6,6 +6,7 @@
   --psy-blue: #4cc9f0;
   --psy-cream: #fefae0;
   --psy-red: #e63946;
+  --in-tune-green: #00ff88; /* チューニングが合った時の色 */
 }
 
 /* --- アニメーション定義 --- */
@@ -20,6 +21,12 @@
   33% { color: #00ffff; filter: drop-shadow(0 0 10px #00ffff); }
   66% { color: #ffff00; filter: drop-shadow(0 0 10px #ffff00); }
   100% { color: #ff00ff; filter: drop-shadow(0 0 10px #ff00ff); }
+}
+
+@keyframes pulse-green {
+  0% { box-shadow: 0 0 20px rgba(0, 255, 136, 0.4); }
+  50% { box-shadow: 0 0 40px rgba(0, 255, 136, 0.8); }
+  100% { box-shadow: 0 0 20px rgba(0, 255, 136, 0.4); }
 }
 
 /* --- ベース設定 --- */
@@ -66,16 +73,25 @@ body {
   width: 100%;
 }
 
-.note { line-height: 1.1; }
-.cents { margin-top: 5px; }
+.note { line-height: 1.1; transition: color 0.2s ease, text-shadow 0.2s ease; }
+.cents { margin-top: 5px; transition: color 0.2s ease; }
 .frequency { margin-top: 10px; font-family: monospace; letter-spacing: 1px; }
+
+/* --- チューニング一致時の共通演出 --- */
+.is-in-tune .note { color: var(--in-tune-green) !important; text-shadow: 0 0 20px var(--in-tune-green) !important; }
+.is-in-tune .cents { color: var(--in-tune-green) !important; font-weight: bold; }
 
 /* --- テーマ別スタイル --- */
 
-/* PSYCHEDELIC (静止画背景) */
+/* PSYCHEDELIC */
 .theme-psychedelic { 
   background-image: url('../psychedelic-bg.png'); 
   background-color: #000;
+}
+.theme-psychedelic .psy-bg {
+  position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+  background-image: inherit; background-size: cover; background-position: center;
+  opacity: 1; z-index: -2;
 }
 .theme-psychedelic .app-header h1 { 
   font-size: 1.1rem; letter-spacing: 4px; color: #fff; text-transform: uppercase;
@@ -86,10 +102,15 @@ body {
   width: min(75vw, 280px); aspect-ratio: 1/1; background: rgba(0, 0, 0, 0.7);
   border: 2px solid rgba(255, 255, 255, 0.3); backdrop-filter: blur(12px);
   border-radius: 50%; display: flex; align-items: center; justify-content: center; position: relative;
+  transition: all 0.3s ease;
+}
+.theme-psychedelic.is-in-tune .frequency-display {
+  border-color: var(--in-tune-green);
+  box-shadow: 0 0 50px rgba(0, 255, 136, 0.5);
 }
 .theme-psychedelic .note { font-size: 5rem; color: #fff; text-shadow: 0 0 20px rgba(255,255,255,0.6); }
-.theme-psychedelic .cents { color: #ffeb3b; font-size: 1.2rem; text-shadow: 1px 1px 2px #000; }
-.theme-psychedelic .frequency { color: #4fc3f7; font-size: 0.9rem; text-shadow: 1px 1px 2px #000; }
+.theme-psychedelic .cents { color: var(--psy-yellow); font-size: 1.2rem; text-shadow: 1px 1px 2px #000; }
+.theme-psychedelic .frequency { color: var(--psy-blue); font-size: 0.9rem; text-shadow: 1px 1px 2px #000; }
 .theme-psychedelic .tuner-controls button {
   background: #fff; color: #000; padding: 12px 40px; font-weight: 900;
   border-radius: 30px; box-shadow: 0 4px 15px rgba(0,0,0,0.5); text-transform: uppercase; border: none; margin-top: 15px;
@@ -102,7 +123,11 @@ body {
   width: 100%; min-height: 200px; background: linear-gradient(to bottom right, #fdf2f8, #f5f3ff);
   border-radius: 20px; box-shadow: 0 10px 25px rgba(0,0,0,0.05);
   display: flex; align-items: center; justify-content: center; border: 1px solid rgba(0,0,0,0.05);
-  padding: 20px 0;
+  padding: 20px 0; transition: all 0.3s ease;
+}
+.theme-classic.is-in-tune .frequency-display {
+  background: linear-gradient(to bottom right, #f0fff4, #dcffe4);
+  border-color: var(--in-tune-green);
 }
 .theme-classic .note { font-size: 4.5rem; font-weight: 800; color: #7a9a8f; }
 .theme-classic .cents { font-size: 1rem; color: #f59e0b; font-weight: 600; }
@@ -112,7 +137,7 @@ body {
   font-size: 1.2rem; font-weight: bold; box-shadow: 0 4px 15px rgba(239, 68, 68, 0.3); border: none; margin-top: 20px;
 }
 
-/* NEON (静止画背景) */
+/* NEON */
 .theme-neon { 
   background-image: url('../neon-bg.png'); 
   background-color: #000;
@@ -120,18 +145,23 @@ body {
 .theme-neon .app-header h1 { color: #ff00ff; font-size: 1.4rem; letter-spacing: 3px; text-shadow: 0 0 10px #ff00ff; }
 .theme-neon .theme-switcher-inline button { color: #ff00ff; border-color: #ff00ff; background: rgba(0,0,0,0.5); }
 .theme-neon .frequency-display {
-  width: min(65vw, 220px); aspect-ratio: 1/1; border-radius: 50%; background: rgba(0, 0, 0, 0.6);
+  width: min(70vw, 240px); aspect-ratio: 1/1; border-radius: 50%; background: rgba(0, 0, 0, 0.6);
   backdrop-filter: blur(15px); border: 2px solid #ff00ff;
   box-shadow: 0 0 30px rgba(255, 0, 255, 0.3);
   display: flex; align-items: center; justify-content: center; position: relative;
+  transition: all 0.3s ease;
 }
-.theme-neon .note { font-size: 4.5rem; animation: rainbow-text 4s linear infinite; }
-.theme-neon .cents { color: #00ffff; font-size: 1.1rem; text-shadow: 0 0 10px #00ffff; }
-.theme-neon .frequency { color: rgba(255,255,255,0.7); font-size: 0.8rem; }
+.theme-neon.is-in-tune .frequency-display {
+  border-color: var(--in-tune-green);
+  box-shadow: 0 0 40px var(--in-tune-green);
+  animation: pulse-green 2s infinite;
+}
+.theme-neon .note { font-size: 5rem; animation: rainbow-text 4s linear infinite; }
+.theme-neon .cents { color: #00ffff; font-size: 1.2rem; text-shadow: 0 0 10px #00ffff; }
+.theme-neon .frequency { color: rgba(255,255,255,0.6); font-size: 0.9rem; }
 .theme-neon .tuner-controls button {
   background: transparent; border: 2px solid #ff00ff; color: #ff00ff;
-  padding: 10px 40px; font-weight: 900; box-shadow: 0 0 20px rgba(255, 0, 255, 0.4); margin-top: 15px;
-  border-radius: 25px;
+  padding: 10px 40px; font-weight: 900; box-shadow: 0 0 15px rgba(255, 0, 255, 0.3); margin-top: 15px;
 }
 
 /* --- メーター共通 --- */
@@ -139,7 +169,7 @@ body {
 .meter-container { position: relative; width: 100%; height: 50px; display: flex; align-items: center; }
 
 .theme-psychedelic .meter-container, .theme-neon .meter-container {
-  height: 40px; background: rgba(255, 255, 255, 0.1); border-radius: 20px; border: 1px solid rgba(255, 255, 255, 0.1); overflow: hidden;
+  height: 40px; background: rgba(255, 255, 255, 0.15); border-radius: 20px; border: 1px solid rgba(255, 255, 255, 0.1); overflow: hidden;
 }
 .theme-classic .meter-container {
   height: 10px; background: linear-gradient(90deg, #ef4444, #f59e0b, #10b981, #f59e0b, #ef4444); border-radius: 5px; overflow: visible;
@@ -162,7 +192,15 @@ body {
 
 /* 正確性インジケーター */
 .accuracy-indicator { margin-top: 10px; display: flex; justify-content: center; }
-.accuracy-light { width: 12px; height: 12px; background: #ef4444; border-radius: 50%; opacity: 0.9; }
+.accuracy-light { 
+  width: 12px; height: 12px; background: #ef4444; border-radius: 50%; opacity: 0.9; 
+  transition: all 0.2s ease;
+}
+.accuracy-light.active {
+  background: var(--in-tune-green);
+  box-shadow: 0 0 15px var(--in-tune-green);
+  transform: scale(1.2);
+}
 .theme-psychedelic .accuracy-indicator, .theme-neon .accuracy-indicator { display: none; }
 
 .error-message { color: #ef4444; font-size: 0.7rem; text-align: center; width: 80%; z-index: 20; }
