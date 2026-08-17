@@ -8,11 +8,11 @@
   --psy-green: #00ff00;
 }
 
-/* --- サイケデリック背景アニメーション --- */
+/* --- アニメーション定義 --- */
 @keyframes fluid {
   0% { transform: translate(0, 0) scale(1) rotate(0deg); }
-  33% { transform: translate(5%, 5%) scale(1.1) rotate(5deg); }
-  66% { transform: translate(-5%, 2%) scale(0.9) rotate(-5deg); }
+  33% { transform: translate(2%, 2%) scale(1.05) rotate(2deg); }
+  66% { transform: translate(-2%, 1%) scale(0.95) rotate(-2deg); }
   100% { transform: translate(0, 0) scale(1) rotate(0deg); }
 }
 
@@ -25,9 +25,17 @@
 
 @keyframes kaleidoscope {
   from { transform: rotate(0deg) scale(1); }
-  to { transform: rotate(360deg) scale(1.5); }
+  to { transform: rotate(360deg) scale(1.2); }
 }
 
+@keyframes rainbow-text {
+  0% { color: #ff00ff; filter: drop-shadow(0 0 10px #ff00ff); }
+  33% { color: #00ffff; filter: drop-shadow(0 0 10px #00ffff); }
+  66% { color: #ffff00; filter: drop-shadow(0 0 10px #ffff00); }
+  100% { color: #ff00ff; filter: drop-shadow(0 0 10px #ff00ff); }
+}
+
+/* --- ベース設定 --- */
 body {
   margin: 0;
   padding: 0;
@@ -37,48 +45,54 @@ body {
   height: 100%;
   background: #000;
   font-family: 'Arial Black', sans-serif;
+  -webkit-user-select: none;
+  user-select: none;
 }
 
-/* 液体のような動く背景層 */
 .psy-bg {
   position: absolute;
-  top: -50%;
-  left: -50%;
-  width: 200%;
-  height: 200%;
+  top: -25%; left: -25%; width: 150%; height: 150%;
   background: 
     radial-gradient(circle at 30% 30%, var(--psy-pink) 0%, transparent 50%),
     radial-gradient(circle at 70% 20%, var(--psy-cyan) 0%, transparent 50%),
     radial-gradient(circle at 40% 80%, var(--psy-yellow) 0%, transparent 50%),
-    radial-gradient(circle at 80% 80%, var(--psy-purple) 0%, transparent 50%),
-    radial-gradient(circle at 50% 50%, var(--psy-green) 0%, transparent 60%);
-  filter: blur(60px) contrast(150%);
-  animation: fluid 15s ease-in-out infinite alternate;
-  opacity: 0.6;
+    radial-gradient(circle at 80% 80%, var(--psy-purple) 0%, transparent 50%);
+  filter: blur(50px) contrast(140%);
+  animation: fluid 20s ease-in-out infinite alternate;
+  opacity: 0.5;
   z-index: -2;
 }
 
-/* 万華鏡のような幾何学模様層 */
 .psy-pattern {
   position: absolute;
   top: 0; left: 0; width: 100%; height: 100%;
-  background-image: 
-    repeating-conic-gradient(from 0deg, transparent 0deg 10deg, rgba(255,255,255,0.05) 10deg 20deg),
-    repeating-radial-gradient(circle at center, transparent 0 20px, rgba(255,255,255,0.03) 20px 40px);
-  animation: kaleidoscope 60s linear infinite;
+  background-image: repeating-conic-gradient(from 0deg, transparent 0deg 20deg, rgba(255,255,255,0.02) 20deg 40deg);
+  animation: kaleidoscope 100s linear infinite;
   z-index: -1;
-  opacity: 0.3;
+  opacity: 0.2;
 }
 
 .app {
-  min-height: 100vh;
+  height: 100vh;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: space-between;
   padding: env(safe-area-inset-top) 20px env(safe-area-inset-bottom);
   box-sizing: border-box;
-  position: relative;
+}
+
+.app-header {
+  padding-top: 20px;
+}
+
+.app-header h1 {
+  font-size: 1.2rem;
+  letter-spacing: 3px;
+  color: white;
+  text-transform: uppercase;
+  margin: 0;
+  opacity: 0.8;
 }
 
 .tuner-main {
@@ -88,41 +102,36 @@ body {
   align-items: center;
   justify-content: center;
   width: 100%;
-  max-width: 500px;
-  gap: 40px;
+  max-width: 400px;
+  gap: 30px;
 }
 
-/* メインの表示エリア - 有機的な形状 */
+/* メインディスプレイ */
 .frequency-display {
   position: relative;
-  width: 300px;
-  height: 300px;
+  width: 240px;
+  height: 240px;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  background: rgba(0, 0, 0, 0.4);
+  background: rgba(0, 0, 0, 0.5);
   backdrop-filter: blur(10px);
-  border: 2px solid rgba(255, 255, 255, 0.2);
-  animation: morph 8s ease-in-out infinite;
-  box-shadow: 0 0 50px rgba(0, 0, 0, 0.5), inset 0 0 30px rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  animation: morph 10s ease-in-out infinite;
 }
 
 .note {
-  font-size: 7rem;
+  font-size: 5rem;
   font-weight: 900;
-  background: linear-gradient(to bottom, #fff, #ccc);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  filter: drop-shadow(0 0 20px var(--psy-pink));
+  animation: rainbow-text 4s linear infinite;
   line-height: 1;
 }
 
 .cents {
-  font-size: 1.5rem;
+  font-size: 1.2rem;
   color: var(--psy-yellow);
-  text-shadow: 0 0 15px var(--psy-yellow);
-  margin-top: 10px;
+  margin-top: 5px;
 }
 
 .frequency {
@@ -130,53 +139,39 @@ body {
   bottom: 30px;
   font-family: monospace;
   color: var(--psy-cyan);
-  text-shadow: 0 0 10px var(--psy-cyan);
-  letter-spacing: 2px;
-}
-
-/* 音に反応している時のエフェクト */
-.is-listening .psy-bg {
-  animation-duration: 3s;
-  opacity: 0.8;
-  filter: blur(40px) contrast(200%);
-}
-
-.is-listening .frequency-display {
-  animation-duration: 2s;
-  border-color: var(--psy-cyan);
-  box-shadow: 0 0 70px var(--psy-purple);
+  font-size: 0.8rem;
+  letter-spacing: 1px;
 }
 
 /* メーター */
-.tuning-meter { width: 100%; }
-.meter-container { 
-  position: relative; 
-  height: 80px; 
+.tuning-meter {
+  width: 100%;
+  padding: 0 10px;
+}
+
+.meter-container {
+  position: relative;
+  height: 60px;
   background: rgba(255, 255, 255, 0.05);
-  border-radius: 40px;
-  overflow: hidden;
+  border-radius: 30px;
   border: 1px solid rgba(255, 255, 255, 0.1);
+  display: flex;
+  align-items: center;
 }
 
 .meter-track {
   width: 100%; height: 100%;
-  background: linear-gradient(90deg, 
-    var(--psy-pink) 0%, 
-    var(--psy-purple) 25%, 
-    var(--psy-cyan) 50%, 
-    var(--psy-green) 75%, 
-    var(--psy-yellow) 100%);
-  opacity: 0.2;
+  background: linear-gradient(90deg, var(--psy-pink), var(--psy-purple), var(--psy-cyan), var(--psy-green), var(--psy-yellow));
+  opacity: 0.15;
 }
 
 .meter-indicator {
   position: absolute;
-  top: 0;
-  width: 6px;
+  width: 4px;
   height: 100%;
   background: #fff;
-  box-shadow: 0 0 20px #fff, 0 0 40px var(--psy-cyan);
-  z-index: 2;
+  box-shadow: 0 0 15px #fff, 0 0 30px var(--psy-cyan);
+  z-index: 5;
   transition: left 0.1s ease-out;
 }
 
@@ -185,41 +180,76 @@ body {
   left: 50%;
   width: 2px;
   height: 100%;
-  background: rgba(255, 255, 255, 0.5);
-  z-index: 1;
+  background: rgba(255, 255, 255, 0.3);
+  z-index: 2;
 }
 
-/* ボタン */
+.scale-mark {
+  position: absolute;
+  top: 0;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  pointer-events: none;
+}
+
+.scale-label {
+  font-size: 0.6rem;
+  color: rgba(255, 255, 255, 0.4);
+  font-family: monospace;
+  position: absolute;
+  top: 5px;
+}
+
+/* コントロール */
+.tuner-controls {
+  padding-bottom: 40px;
+}
+
 .tuner-controls button {
   background: white;
   color: black;
   border: none;
-  padding: 20px 60px;
-  font-size: 1.5rem;
+  padding: 15px 50px;
+  font-size: 1.2rem;
   font-weight: 900;
-  border-radius: 50px;
-  text-transform: uppercase;
-  letter-spacing: 5px;
-  box-shadow: 0 0 30px rgba(255, 255, 255, 0.5);
-  transition: 0.3s;
+  border-radius: 40px;
+  letter-spacing: 2px;
+  box-shadow: 0 0 20px rgba(255, 255, 255, 0.3);
+  transition: 0.2s;
 }
 
 .tuner-controls button.active {
   background: var(--psy-pink);
   color: white;
-  box-shadow: 0 0 50px var(--psy-pink);
+  box-shadow: 0 0 30px var(--psy-pink);
 }
 
-/* テーマ切り替えボタン */
 .theme-switcher {
   position: absolute;
-  top: 20px; right: 20px; z-index: 100;
+  top: 20px; right: 20px;
 }
+
 .theme-switcher button {
   background: rgba(255, 255, 255, 0.1);
   border: 1px solid rgba(255, 255, 255, 0.2);
   color: white;
-  padding: 8px 15px;
-  border-radius: 20px;
-  font-size: 0.8rem;
+  padding: 6px 12px;
+  border-radius: 15px;
+  font-size: 0.7rem;
 }
+
+.error-message {
+  position: absolute;
+  top: 60px;
+  color: #ff3300;
+  font-size: 0.7rem;
+  text-align: center;
+  width: 80%;
+}
+
+/* テーマ別微調整 */
+.theme-classic .frequency-display { border-radius: 20px; animation: none; }
+.theme-neon .frequency-display { border-radius: 50%; }
