@@ -9,10 +9,6 @@ function App() {
     return localStorage.getItem('tuner-theme') || 'classic';
   })
   
-  const [hapticEnabled, setHapticEnabled] = useState(() => {
-    return localStorage.getItem('tuner-haptic') === 'true';
-  })
-
   const {
     isListening,
     frequency,
@@ -23,29 +19,12 @@ function App() {
     stopListening
   } = useAudioProcessor()
 
-  const lastInTuneRef = useRef(false);
-
   // チューニングが合っているか判定 (±3セント以内)
   const isInTune = isListening && Math.abs(cents) <= 3 && note !== '';
-
-  // 触覚フィードバック (バイブレーション) ロジック
-  useEffect(() => {
-    if (hapticEnabled && isInTune && !lastInTuneRef.current) {
-      if ('vibrate' in navigator) {
-        // 短い振動 (50ms)
-        navigator.vibrate(50);
-      }
-    }
-    lastInTuneRef.current = isInTune;
-  }, [isInTune, hapticEnabled]);
 
   useEffect(() => {
     localStorage.setItem('tuner-theme', theme);
   }, [theme])
-
-  useEffect(() => {
-    localStorage.setItem('tuner-haptic', hapticEnabled);
-  }, [hapticEnabled])
 
   useEffect(() => {
     if ('serviceWorker' in navigator) {
@@ -74,10 +53,6 @@ function App() {
     });
   }
 
-  const toggleHaptic = () => {
-    setHapticEnabled(!hapticEnabled);
-  }
-
   return (
     <div className={`app theme-${theme} ${isListening ? 'is-listening' : ''} ${isInTune ? 'is-in-tune' : ''}`}>
       <div className="psy-bg"></div>
@@ -91,12 +66,6 @@ function App() {
           <div className="theme-switcher-inline">
             <button onClick={nextTheme}>
               {theme === 'classic' ? 'モード切替' : `Theme: ${theme.toUpperCase()}`}
-            </button>
-            <button 
-              onClick={toggleHaptic} 
-              className={`haptic-toggle ${hapticEnabled ? 'on' : 'off'}`}
-            >
-              {hapticEnabled ? '📳 振動: ON' : '📴 振動: OFF'}
             </button>
           </div>
         </div>
