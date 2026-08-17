@@ -22,6 +22,13 @@
   100% { border-radius: 40% 60% 60% 40% / 40% 40% 60% 60%; }
 }
 
+@keyframes rainbow-text {
+  0% { color: #ff00ff; filter: drop-shadow(0 0 10px #ff00ff); }
+  33% { color: #00ffff; filter: drop-shadow(0 0 10px #00ffff); }
+  66% { color: #ffff00; filter: drop-shadow(0 0 10px #ffff00); }
+  100% { color: #ff00ff; filter: drop-shadow(0 0 10px #ff00ff); }
+}
+
 /* --- ベース設定 --- */
 body {
   margin: 0;
@@ -30,7 +37,7 @@ body {
   position: fixed;
   width: 100%;
   height: 100%;
-  font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
   -webkit-user-select: none;
   user-select: none;
 }
@@ -44,7 +51,6 @@ body {
   padding: env(safe-area-inset-top) 20px env(safe-area-inset-bottom);
   box-sizing: border-box;
   position: relative;
-  transition: background 0.3s ease;
 }
 
 .tuner-main {
@@ -54,8 +60,8 @@ body {
   align-items: center;
   justify-content: center;
   width: 100%;
-  max-width: 450px;
-  gap: 30px;
+  max-width: 400px;
+  gap: 20px;
   z-index: 10;
 }
 
@@ -74,143 +80,110 @@ body {
 }
 
 .theme-psychedelic .app-header h1 {
-  font-size: 1.2rem; letter-spacing: 5px; color: var(--psy-cream); text-transform: uppercase;
+  font-size: 1rem; letter-spacing: 5px; color: var(--psy-cream); text-transform: uppercase;
 }
 
 .theme-psychedelic .frequency-display {
-  width: 260px; height: 260px; background: rgba(27, 38, 59, 0.7);
-  border: 4px solid var(--psy-cream); animation: morph-blob 8s ease-in-out infinite;
+  width: min(70vw, 260px);
+  aspect-ratio: 1 / 1;
+  background: rgba(27, 38, 59, 0.7);
+  border: 4px solid var(--psy-cream);
+  animation: morph-blob 8s ease-in-out infinite;
   box-shadow: 10px 10px 0 var(--psy-orange), -5px -5px 0 var(--psy-blue);
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
 }
 
-.theme-psychedelic .note { font-size: 6rem; color: var(--psy-cream); text-shadow: 4px 4px 0 var(--psy-navy); }
-.theme-psychedelic .cents { color: var(--psy-orange); }
-.theme-psychedelic .frequency { color: var(--psy-blue); }
+.theme-psychedelic .note { font-size: 5rem; color: var(--psy-cream); text-shadow: 4px 4px 0 var(--psy-navy); }
+.theme-psychedelic .cents { color: var(--psy-orange); font-size: 1.2rem; }
+.theme-psychedelic .frequency { color: var(--psy-blue); position: absolute; bottom: 20px; font-size: 0.8rem; }
 
 .theme-psychedelic .tuner-controls button {
-  background: var(--psy-cream); color: var(--psy-navy); padding: 15px 50px; font-weight: 900;
-  box-shadow: 8px 8px 0 var(--psy-orange); text-transform: uppercase;
+  background: var(--psy-cream); color: var(--psy-navy); padding: 12px 40px; font-weight: 900;
+  box-shadow: 6px 6px 0 var(--psy-orange); text-transform: uppercase; border: none;
 }
 
-/* --- テーマ2: CLASSIC (ユーザー提供画像再現) --- */
+/* --- テーマ2: CLASSIC (画像再現) --- */
 .theme-classic { background: #ffffff; }
 
 .theme-classic .app-header h1 {
-  font-size: 2.5rem;
-  color: #c07b92;
-  font-weight: bold;
-  text-shadow: 0 0 10px rgba(192, 123, 146, 0.2);
-  margin-bottom: 10px;
+  font-size: 1.8rem; color: #c07b92; font-weight: bold; margin-bottom: 5px;
 }
 
 .theme-classic .frequency-display {
-  width: 100%;
-  max-width: 380px;
-  height: 200px;
+  width: 100%; height: 180px;
   background: linear-gradient(to bottom right, #fdf2f8, #f5f3ff);
-  border-radius: 20px;
-  box-shadow: 0 10px 25px rgba(0,0,0,0.05);
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
+  border-radius: 20px; box-shadow: 0 10px 25px rgba(0,0,0,0.05);
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
   border: 1px solid rgba(0,0,0,0.05);
 }
 
-.theme-classic .note {
-  font-size: 5rem;
-  font-weight: 800;
-  color: #7a9a8f; /* 画像のグリーンの色味 */
-  text-shadow: 0 2px 4px rgba(0,0,0,0.1);
-}
-
-.theme-classic .cents {
-  font-size: 1rem;
-  color: #f59e0b; /* オレンジ */
-  font-weight: 600;
-}
-
-.theme-classic .frequency {
-  position: static;
-  margin-top: 10px;
-  font-size: 1.1rem;
-  color: #3b82f6; /* ブルー */
-  font-weight: 700;
-  letter-spacing: 0;
-}
-
-.theme-classic .tuning-meter { width: 100%; padding: 20px 0; }
-
-.theme-classic .meter-container {
-  height: 12px;
-  background: linear-gradient(90deg, #ef4444, #f59e0b, #10b981, #f59e0b, #ef4444);
-  border-radius: 6px;
-  border: none;
-  overflow: visible;
-}
-
-.theme-classic .meter-indicator {
-  width: 3px;
-  height: 30px;
-  background: #ef4444;
-  box-shadow: 0 0 5px rgba(239, 68, 68, 0.5);
-  top: 50%;
-  transform: translate(-50%, -50%);
-  border-radius: 2px;
-}
-
-.theme-classic .center-line {
-  width: 2px;
-  height: 15px;
-  background: #d1d5db;
-  top: -15px;
-}
-
-.theme-classic .scale-label {
-  color: #9ca3af;
-  top: -25px;
-  font-weight: bold;
-}
-
-.theme-classic .accuracy-indicator {
-  margin-top: 15px;
-  display: flex;
-  justify-content: center;
-}
-
-.theme-classic .accuracy-light {
-  width: 15px;
-  height: 15px;
-  background: #ef4444;
-  border-radius: 50%;
-  box-shadow: 0 0 10px rgba(239, 68, 68, 0.3);
-}
+.theme-classic .note { font-size: 4.5rem; font-weight: 800; color: #7a9a8f; }
+.theme-classic .cents { font-size: 0.9rem; color: #f59e0b; font-weight: 600; }
+.theme-classic .frequency { margin-top: 5px; font-size: 1rem; color: #3b82f6; font-weight: 700; }
 
 .theme-classic .tuner-controls button {
-  background: #ef4444;
-  color: white;
-  padding: 10px 35px;
-  border-radius: 25px;
-  font-size: 1.2rem;
-  font-weight: bold;
-  box-shadow: 0 4px 15px rgba(239, 68, 68, 0.3);
+  background: #ef4444; color: white; padding: 10px 40px; border-radius: 25px;
+  font-size: 1.2rem; font-weight: bold; box-shadow: 0 4px 15px rgba(239, 68, 68, 0.3); border: none;
 }
 
 /* --- テーマ3: NEON --- */
 .theme-neon { background: #000; }
+.theme-neon .app-header h1 { color: #ff00ff; font-size: 1.2rem; letter-spacing: 4px; }
 .theme-neon .frequency-display {
-  width: 240px; height: 240px; border-radius: 50%; background: rgba(255, 255, 255, 0.05);
+  width: min(70vw, 240px);
+  aspect-ratio: 1 / 1;
+  border-radius: 50%; background: rgba(255, 255, 255, 0.05);
   backdrop-filter: blur(20px); border: 1px solid rgba(255, 255, 255, 0.1);
   box-shadow: 0 0 40px rgba(255, 0, 255, 0.2);
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
 }
-.theme-neon .note { animation: rainbow-text 4s linear infinite; }
+.theme-neon .note { font-size: 5rem; animation: rainbow-text 4s linear infinite; }
+.theme-neon .cents { color: #00ffff; font-size: 1.2rem; }
+.theme-neon .frequency { color: rgba(255,255,255,0.5); position: absolute; bottom: 20px; font-size: 0.8rem; }
+.theme-neon .tuner-controls button {
+  background: transparent; border: 2px solid #ff00ff; color: #ff00ff;
+  padding: 10px 40px; font-weight: 900; box-shadow: 0 0 15px rgba(255, 0, 255, 0.3);
+}
+
+/* --- メーター共通 --- */
+.tuning-meter { width: 100%; margin: 10px 0; }
+.meter-container { position: relative; width: 100%; height: 50px; display: flex; align-items: center; }
+
+/* 各テーマのメーター形状 */
+.theme-psychedelic .meter-container, .theme-neon .meter-container {
+  height: 50px; background: rgba(255, 255, 255, 0.05); border-radius: 25px; border: 1px solid rgba(255, 255, 255, 0.1); overflow: hidden;
+}
+
+.theme-classic .meter-container {
+  height: 10px; background: linear-gradient(90deg, #ef4444, #f59e0b, #10b981, #f59e0b, #ef4444); border-radius: 5px; overflow: visible;
+}
+
+.meter-track { width: 100%; height: 100%; opacity: 0.2; }
+.theme-psychedelic .meter-track { background: linear-gradient(90deg, var(--psy-pink), var(--psy-purple), var(--psy-cyan), var(--psy-green), var(--psy-yellow)); }
+
+.meter-indicator { position: absolute; width: 4px; height: 100%; background: #fff; z-index: 5; transition: left 0.1s ease-out; }
+.theme-classic .meter-indicator { width: 3px; height: 25px; background: #ef4444; top: 50%; transform: translate(-50%, -50%); border-radius: 2px; }
+.theme-psychedelic .meter-indicator, .theme-neon .meter-indicator { box-shadow: 0 0 15px #fff, 0 0 25px var(--psy-cyan); }
+
+.center-line { position: absolute; left: 50%; width: 2px; height: 100%; background: rgba(255, 255, 255, 0.3); z-index: 2; transform: translateX(-50%); }
+.theme-classic .center-line { height: 12px; top: -12px; background: #d1d5db; }
+
+.scale-mark { position: absolute; top: 0; height: 100%; display: flex; flex-direction: column; align-items: center; }
+.scale-label { font-size: 0.6rem; color: rgba(128, 128, 128, 0.5); position: absolute; top: -20px; font-family: monospace; }
+.theme-classic .scale-label { color: #9ca3af; font-weight: bold; top: -25px; }
+
+/* 正確性インジケーター */
+.accuracy-indicator { margin-top: 10px; display: flex; justify-content: center; }
+.accuracy-light { width: 12px; height: 12px; background: #ef4444; border-radius: 50%; opacity: 0.8; }
+.theme-psychedelic .accuracy-indicator, .theme-neon .accuracy-indicator { display: none; }
 
 /* --- 共通コントロール --- */
-.theme-switcher { position: absolute; top: 20px; right: 20px; z-index: 100; }
+.theme-switcher { position: absolute; top: 10px; right: 10px; z-index: 100; }
 .theme-switcher button {
   background: rgba(128, 128, 128, 0.1); border: 1px solid rgba(128, 128, 128, 0.2);
-  color: #666; padding: 5px 12px; border-radius: 15px; font-size: 0.7rem;
+  color: #888; padding: 4px 10px; border-radius: 12px; font-size: 0.6rem;
 }
-.theme-psychedelic .theme-switcher button { color: white; border-color: white; }
+.theme-psychedelic .theme-switcher button { color: var(--psy-cream); border-color: var(--psy-cream); }
 
-.error-message { color: #ef4444; font-size: 0.8rem; text-align: center; }
+.tuner-controls { padding-bottom: 20px; }
+.error-message { position: absolute; top: 50px; color: #ef4444; font-size: 0.7rem; text-align: center; width: 80%; z-index: 20; }
