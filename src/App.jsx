@@ -5,7 +5,11 @@ import InstallPrompt from './components/InstallPrompt'
 import './App.css'
 
 function App() {
-  const [theme, setTheme] = useState('classic')
+  // 初期状態を localStorage から取得、なければ 'classic'
+  const [theme, setTheme] = useState(() => {
+    return localStorage.getItem('tuner-theme') || 'classic';
+  })
+
   const {
     isListening,
     frequency,
@@ -15,6 +19,11 @@ function App() {
     startListening,
     stopListening
   } = useAudioProcessor()
+
+  // テーマが変更されるたびに localStorage に保存
+  useEffect(() => {
+    localStorage.setItem('tuner-theme', theme);
+  }, [theme])
 
   useEffect(() => {
     if ('serviceWorker' in navigator) {
@@ -64,11 +73,8 @@ function App() {
         
         <div className="frequency-display">
           <div className="note-display">
-            {/* 1. 音階表示 */}
             <span className="note">{note || '--'}</span>
-            {/* 2. セント表示 (音階のすぐ下) */}
             <span className="cents">{cents > 0 ? `+${cents}` : cents || '0'} cents</span>
-            {/* 3. 周波数表示 (セントの下) */}
             <div className="frequency">
               {frequency.toFixed(2)} Hz
             </div>
