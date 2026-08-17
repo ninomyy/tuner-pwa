@@ -5,7 +5,7 @@ import InstallPrompt from './components/InstallPrompt'
 import './App.css'
 
 function App() {
-  const [theme, setTheme] = useState('classic') // デフォルトをクラシックに変更
+  const [theme, setTheme] = useState('classic')
   const {
     isListening,
     frequency,
@@ -45,7 +45,6 @@ function App() {
 
   return (
     <div className={`app theme-${theme} ${isListening ? 'is-listening' : ''}`}>
-      {/* サイケデリック背景用SVGフィルター (PSYCHEDELICテーマ時のみ有効) */}
       <svg style={{ position: 'absolute', width: 0, height: 0 }}>
         <filter id="wavy">
           <feTurbulence type="fractalNoise" baseFrequency="0.01" numOctaves="3" seed="2">
@@ -63,11 +62,12 @@ function App() {
         </button>
       </div>
 
-      <header className="app-header">
-        <h1>{theme === 'classic' ? 'クロマチックチューナー' : 'TUNER'}</h1>
-      </header>
-      
       <main className="tuner-main">
+        {/* タイトルをメインエリアのトップに配置 */}
+        <header className="app-header">
+          <h1>{theme === 'classic' ? 'クロマチックチューナー' : 'TUNER'}</h1>
+        </header>
+
         {error && <div className="error-message">{error}</div>}
         
         <div className="frequency-display">
