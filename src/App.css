@@ -6,7 +6,7 @@
   --psy-blue: #4cc9f0;
   --psy-cream: #fefae0;
   --psy-red: #e63946;
-  --in-tune-green: #00ff88; /* チューニングが合った時の色 */
+  --in-tune-green: #00ff88;
 }
 
 /* --- アニメーション定義 --- */
@@ -58,10 +58,22 @@ body {
 
 .app-header h1 { margin: 0; text-align: center; }
 
+.theme-switcher-inline {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
 .theme-switcher-inline button {
   background: rgba(128, 128, 128, 0.15); border: 1px solid rgba(128, 128, 128, 0.3);
   color: #888; padding: 5px 15px; border-radius: 20px; font-size: 0.7rem;
   backdrop-filter: blur(5px); transition: all 0.2s;
+}
+
+.sound-toggle.on {
+  color: var(--in-tune-green);
+  border-color: var(--in-tune-green);
+  background: rgba(0, 255, 136, 0.1);
 }
 
 /* --- ディスプレイ共通 --- */
@@ -88,16 +100,12 @@ body {
   background-image: url('../psychedelic-bg.png'); 
   background-color: #000;
 }
-.theme-psychedelic .psy-bg {
-  position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-  background-image: inherit; background-size: cover; background-position: center;
-  opacity: 1; z-index: -2;
-}
 .theme-psychedelic .app-header h1 { 
   font-size: 1.1rem; letter-spacing: 4px; color: #fff; text-transform: uppercase;
   text-shadow: 2px 2px 4px rgba(0,0,0,0.8);
 }
 .theme-psychedelic .theme-switcher-inline button { color: #fff; border-color: rgba(255,255,255,0.5); background: rgba(0,0,0,0.4); }
+.theme-psychedelic .sound-toggle.on { color: var(--in-tune-green); border-color: var(--in-tune-green); }
 .theme-psychedelic .frequency-display {
   width: min(75vw, 280px); aspect-ratio: 1/1; background: rgba(0, 0, 0, 0.7);
   border: 2px solid rgba(255, 255, 255, 0.3); backdrop-filter: blur(12px);
@@ -109,8 +117,8 @@ body {
   box-shadow: 0 0 50px rgba(0, 255, 136, 0.5);
 }
 .theme-psychedelic .note { font-size: 5rem; color: #fff; text-shadow: 0 0 20px rgba(255,255,255,0.6); }
-.theme-psychedelic .cents { color: var(--psy-yellow); font-size: 1.2rem; text-shadow: 1px 1px 2px #000; }
-.theme-psychedelic .frequency { color: var(--psy-blue); font-size: 0.9rem; text-shadow: 1px 1px 2px #000; }
+.theme-psychedelic .cents { color: #ffeb3b; font-size: 1.2rem; text-shadow: 1px 1px 2px #000; }
+.theme-psychedelic .frequency { color: #4fc3f7; font-size: 0.9rem; text-shadow: 1px 1px 2px #000; }
 .theme-psychedelic .tuner-controls button {
   background: #fff; color: #000; padding: 12px 40px; font-weight: 900;
   border-radius: 30px; box-shadow: 0 4px 15px rgba(0,0,0,0.5); text-transform: uppercase; border: none; margin-top: 15px;
@@ -144,6 +152,7 @@ body {
 }
 .theme-neon .app-header h1 { color: #ff00ff; font-size: 1.4rem; letter-spacing: 3px; text-shadow: 0 0 10px #ff00ff; }
 .theme-neon .theme-switcher-inline button { color: #ff00ff; border-color: #ff00ff; background: rgba(0,0,0,0.5); }
+.theme-neon .sound-toggle.on { color: var(--in-tune-green); border-color: var(--in-tune-green); box-shadow: 0 0 10px var(--in-tune-green); }
 .theme-neon .frequency-display {
   width: min(70vw, 240px); aspect-ratio: 1/1; border-radius: 50%; background: rgba(0, 0, 0, 0.6);
   backdrop-filter: blur(15px); border: 2px solid #ff00ff;
