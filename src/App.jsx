@@ -5,7 +5,7 @@ import InstallPrompt from './components/InstallPrompt'
 import './App.css'
 
 function App() {
-  const [theme, setTheme] = useState('neon') // 'neon' or 'classic'
+  const [theme, setTheme] = useState('psychedelic') // 'psychedelic', 'neon', or 'classic'
   const {
     isListening,
     frequency,
@@ -35,15 +35,23 @@ function App() {
     }
   }
 
-  const toggleTheme = () => {
-    setTheme(prev => prev === 'neon' ? 'classic' : 'neon')
+  const nextTheme = () => {
+    setTheme(prev => {
+      if (prev === 'psychedelic') return 'neon';
+      if (prev === 'neon') return 'classic';
+      return 'psychedelic';
+    });
   }
 
   return (
     <div className={`app theme-${theme} ${isListening ? 'is-listening' : ''}`}>
+      {/* サイケデリック背景要素 */}
+      <div className="psy-bg"></div>
+      <div className="psy-pattern"></div>
+
       <div className="theme-switcher">
-        <button onClick={toggleTheme}>
-          {theme === 'neon' ? 'Classic Mode' : 'Neon Mode'}
+        <button onClick={nextTheme}>
+          Theme: {theme.toUpperCase()}
         </button>
       </div>
 
@@ -67,7 +75,10 @@ function App() {
         <TuningMeter cents={cents} isListening={isListening} />
 
         <div className="tuner-controls">
-          <button onClick={handleToggleListening}>
+          <button 
+            onClick={handleToggleListening}
+            className={isListening ? 'active' : ''}
+          >
             {isListening ? 'Stop' : 'Start'}
           </button>
         </div>
