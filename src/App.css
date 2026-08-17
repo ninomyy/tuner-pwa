@@ -1,38 +1,25 @@
 @import "tw-animate-css";
 
 :root {
-  --psy-pink: #ff00ff;
-  --psy-cyan: #00ffff;
-  --psy-yellow: #ffff00;
-  --psy-purple: #9d00ff;
-  --psy-green: #00ff00;
+  --psy-orange: #ff9f1c;
+  --psy-navy: #1b263b;
+  --psy-blue: #4cc9f0;
+  --psy-cream: #fefae0;
+  --psy-red: #e63946;
 }
 
 /* --- アニメーション定義 --- */
-@keyframes fluid {
-  0% { transform: translate(0, 0) scale(1) rotate(0deg); }
-  33% { transform: translate(2%, 2%) scale(1.05) rotate(2deg); }
-  66% { transform: translate(-2%, 1%) scale(0.95) rotate(-2deg); }
-  100% { transform: translate(0, 0) scale(1) rotate(0deg); }
+@keyframes wave-flow {
+  0% { transform: translate(0, 0) rotate(0deg) scale(1); }
+  33% { transform: translate(-2%, 2%) rotate(2deg) scale(1.05); }
+  66% { transform: translate(2%, -1%) rotate(-2deg) scale(0.95); }
+  100% { transform: translate(0, 0) rotate(0deg) scale(1); }
 }
 
-@keyframes morph {
+@keyframes morph-blob {
   0% { border-radius: 40% 60% 60% 40% / 40% 40% 60% 60%; }
-  33% { border-radius: 60% 40% 50% 50% / 50% 60% 40% 50%; }
-  66% { border-radius: 45% 55% 35% 65% / 55% 45% 55% 45%; }
+  50% { border-radius: 60% 40% 40% 60% / 60% 60% 40% 40%; }
   100% { border-radius: 40% 60% 60% 40% / 40% 40% 60% 60%; }
-}
-
-@keyframes kaleidoscope {
-  from { transform: rotate(0deg) scale(1); }
-  to { transform: rotate(360deg) scale(1.2); }
-}
-
-@keyframes rainbow-text {
-  0% { color: #ff00ff; filter: drop-shadow(0 0 10px #ff00ff); }
-  33% { color: #00ffff; filter: drop-shadow(0 0 10px #00ffff); }
-  66% { color: #ffff00; filter: drop-shadow(0 0 10px #ffff00); }
-  100% { color: #ff00ff; filter: drop-shadow(0 0 10px #ff00ff); }
 }
 
 /* --- ベース設定 --- */
@@ -43,33 +30,26 @@ body {
   position: fixed;
   width: 100%;
   height: 100%;
-  background: #000;
+  background: var(--psy-navy);
   font-family: 'Arial Black', sans-serif;
   -webkit-user-select: none;
   user-select: none;
 }
 
+/* うねうね背景層 */
 .psy-bg {
   position: absolute;
-  top: -25%; left: -25%; width: 150%; height: 150%;
+  top: -20%; left: -20%; width: 140%; height: 140%;
   background: 
-    radial-gradient(circle at 30% 30%, var(--psy-pink) 0%, transparent 50%),
-    radial-gradient(circle at 70% 20%, var(--psy-cyan) 0%, transparent 50%),
-    radial-gradient(circle at 40% 80%, var(--psy-yellow) 0%, transparent 50%),
-    radial-gradient(circle at 80% 80%, var(--psy-purple) 0%, transparent 50%);
-  filter: blur(50px) contrast(140%);
-  animation: fluid 20s ease-in-out infinite alternate;
-  opacity: 0.5;
+    radial-gradient(circle at 20% 20%, var(--psy-orange) 0%, transparent 40%),
+    radial-gradient(circle at 80% 20%, var(--psy-blue) 0%, transparent 40%),
+    radial-gradient(circle at 20% 80%, var(--psy-red) 0%, transparent 40%),
+    radial-gradient(circle at 80% 80%, var(--psy-cream) 0%, transparent 40%),
+    radial-gradient(circle at 50% 50%, var(--psy-navy) 0%, transparent 60%);
+  filter: url(#wavy); /* SVGフィルタでうねうねさせる */
+  animation: wave-flow 15s ease-in-out infinite alternate;
+  opacity: 0.8;
   z-index: -2;
-}
-
-.psy-pattern {
-  position: absolute;
-  top: 0; left: 0; width: 100%; height: 100%;
-  background-image: repeating-conic-gradient(from 0deg, transparent 0deg 20deg, rgba(255,255,255,0.02) 20deg 40deg);
-  animation: kaleidoscope 100s linear infinite;
-  z-index: -1;
-  opacity: 0.2;
 }
 
 .app {
@@ -80,19 +60,21 @@ body {
   justify-content: space-between;
   padding: env(safe-area-inset-top) 20px env(safe-area-inset-bottom);
   box-sizing: border-box;
+  position: relative;
 }
 
 .app-header {
   padding-top: 20px;
+  z-index: 10;
 }
 
 .app-header h1 {
   font-size: 1.2rem;
-  letter-spacing: 3px;
-  color: white;
+  letter-spacing: 5px;
+  color: var(--psy-cream);
   text-transform: uppercase;
   margin: 0;
-  opacity: 0.8;
+  text-shadow: 2px 2px 0 var(--psy-navy);
 }
 
 .tuner-main {
@@ -104,33 +86,37 @@ body {
   width: 100%;
   max-width: 400px;
   gap: 30px;
+  z-index: 10;
 }
 
 /* メインディスプレイ */
 .frequency-display {
   position: relative;
-  width: 240px;
-  height: 240px;
+  width: 260px;
+  height: 260px;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  background: rgba(0, 0, 0, 0.5);
-  backdrop-filter: blur(10px);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  animation: morph 10s ease-in-out infinite;
+  background: rgba(27, 38, 59, 0.7);
+  backdrop-filter: blur(5px);
+  border: 4px solid var(--psy-cream);
+  animation: morph-blob 8s ease-in-out infinite;
+  box-shadow: 10px 10px 0 var(--psy-orange), -5px -5px 0 var(--psy-blue);
 }
 
 .note {
-  font-size: 5rem;
+  font-size: 6rem;
   font-weight: 900;
-  animation: rainbow-text 4s linear infinite;
+  color: var(--psy-cream);
   line-height: 1;
+  text-shadow: 4px 4px 0 var(--psy-navy);
 }
 
 .cents {
-  font-size: 1.2rem;
-  color: var(--psy-yellow);
+  font-size: 1.5rem;
+  color: var(--psy-orange);
+  text-shadow: 2px 2px 0 var(--psy-navy);
   margin-top: 5px;
 }
 
@@ -138,8 +124,8 @@ body {
   position: absolute;
   bottom: 30px;
   font-family: monospace;
-  color: var(--psy-cyan);
-  font-size: 0.8rem;
+  color: var(--psy-blue);
+  font-size: 0.9rem;
   letter-spacing: 1px;
 }
 
@@ -151,26 +137,31 @@ body {
 
 .meter-container {
   position: relative;
-  height: 60px;
-  background: rgba(255, 255, 255, 0.05);
-  border-radius: 30px;
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  height: 50px;
+  background: var(--psy-navy);
+  border: 3px solid var(--psy-cream);
+  overflow: hidden;
   display: flex;
   align-items: center;
 }
 
 .meter-track {
   width: 100%; height: 100%;
-  background: linear-gradient(90deg, var(--psy-pink), var(--psy-purple), var(--psy-cyan), var(--psy-green), var(--psy-yellow));
-  opacity: 0.15;
+  background: repeating-linear-gradient(90deg, 
+    var(--psy-orange) 0, var(--psy-orange) 20%, 
+    var(--psy-blue) 20%, var(--psy-blue) 40%, 
+    var(--psy-red) 40%, var(--psy-red) 60%, 
+    var(--psy-cream) 60%, var(--psy-cream) 80%);
+  opacity: 0.3;
 }
 
 .meter-indicator {
   position: absolute;
-  width: 4px;
+  top: 0;
+  width: 8px;
   height: 100%;
-  background: #fff;
-  box-shadow: 0 0 15px #fff, 0 0 30px var(--psy-cyan);
+  background: var(--psy-cream);
+  box-shadow: 0 0 15px var(--psy-cream);
   z-index: 5;
   transition: left 0.1s ease-out;
 }
@@ -178,29 +169,11 @@ body {
 .center-line {
   position: absolute;
   left: 50%;
-  width: 2px;
+  width: 4px;
   height: 100%;
-  background: rgba(255, 255, 255, 0.3);
+  background: var(--psy-cream);
+  opacity: 0.5;
   z-index: 2;
-}
-
-.scale-mark {
-  position: absolute;
-  top: 0;
-  height: 100%;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  pointer-events: none;
-}
-
-.scale-label {
-  font-size: 0.6rem;
-  color: rgba(255, 255, 255, 0.4);
-  font-family: monospace;
-  position: absolute;
-  top: 5px;
 }
 
 /* コントロール */
@@ -209,47 +182,39 @@ body {
 }
 
 .tuner-controls button {
-  background: white;
-  color: black;
+  background: var(--psy-cream);
+  color: var(--psy-navy);
   border: none;
   padding: 15px 50px;
-  font-size: 1.2rem;
+  font-size: 1.4rem;
   font-weight: 900;
-  border-radius: 40px;
-  letter-spacing: 2px;
-  box-shadow: 0 0 20px rgba(255, 255, 255, 0.3);
+  border-radius: 0;
+  letter-spacing: 3px;
+  box-shadow: 8px 8px 0 var(--psy-orange);
   transition: 0.2s;
+  text-transform: uppercase;
 }
 
 .tuner-controls button.active {
-  background: var(--psy-pink);
+  background: var(--psy-red);
   color: white;
-  box-shadow: 0 0 30px var(--psy-pink);
+  box-shadow: 8px 8px 0 var(--psy-blue);
+}
+
+.is-listening .psy-bg {
+  animation-duration: 5s;
+  opacity: 1;
 }
 
 .theme-switcher {
   position: absolute;
-  top: 20px; right: 20px;
+  top: 20px; right: 20px; z-index: 20;
 }
 
 .theme-switcher button {
-  background: rgba(255, 255, 255, 0.1);
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  color: white;
-  padding: 6px 12px;
-  border-radius: 15px;
-  font-size: 0.7rem;
+  background: rgba(255, 255, 255, 0.2);
+  border: 1px solid var(--psy-cream);
+  color: var(--psy-cream);
+  padding: 5px 10px;
+  font-size: 0.6rem;
 }
-
-.error-message {
-  position: absolute;
-  top: 60px;
-  color: #ff3300;
-  font-size: 0.7rem;
-  text-align: center;
-  width: 80%;
-}
-
-/* テーマ別微調整 */
-.theme-classic .frequency-display { border-radius: 20px; animation: none; }
-.theme-neon .frequency-display { border-radius: 50%; }

@@ -5,7 +5,7 @@ import InstallPrompt from './components/InstallPrompt'
 import './App.css'
 
 function App() {
-  const [theme, setTheme] = useState('psychedelic') // 'psychedelic', 'neon', or 'classic'
+  const [theme, setTheme] = useState('psychedelic')
   const {
     isListening,
     frequency,
@@ -45,18 +45,36 @@ function App() {
 
   return (
     <div className={`app theme-${theme} ${isListening ? 'is-listening' : ''}`}>
-      {/* サイケデリック背景要素 */}
+      {/* うねうね背景を実現するためのSVGフィルター */}
+      <svg style={{ position: 'absolute', width: 0, height: 0 }}>
+        <filter id="wavy">
+          <feTurbulence 
+            type="fractalNoise" 
+            baseFrequency="0.01" 
+            numOctaves="3" 
+            seed="2"
+          >
+            <animate 
+              attributeName="baseFrequency" 
+              values="0.01;0.02;0.01" 
+              dur="30s" 
+              repeatCount="indefinite" 
+            />
+          </feTurbulence>
+          <feDisplacementMap in="SourceGraphic" scale="60" />
+        </filter>
+      </svg>
+
       <div className="psy-bg"></div>
-      <div className="psy-pattern"></div>
 
       <div className="theme-switcher">
         <button onClick={nextTheme}>
-          Theme: {theme.toUpperCase()}
+          {theme.toUpperCase()}
         </button>
       </div>
 
       <header className="app-header">
-        <h1>Tuner</h1>
+        <h1>TUNER</h1>
       </header>
       
       <main className="tuner-main">
@@ -79,7 +97,7 @@ function App() {
             onClick={handleToggleListening}
             className={isListening ? 'active' : ''}
           >
-            {isListening ? 'Stop' : 'Start'}
+            {isListening ? 'STOP' : 'START'}
           </button>
         </div>
       </main>
