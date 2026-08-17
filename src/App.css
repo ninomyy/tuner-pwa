@@ -57,12 +57,30 @@ body {
   backdrop-filter: blur(5px); transition: all 0.2s;
 }
 
+/* --- ディスプレイ共通 --- */
+.note-display {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+}
+
+.note { line-height: 1.1; }
+.cents { margin-top: 5px; }
+.frequency { margin-top: 10px; font-family: monospace; letter-spacing: 1px; }
+
 /* --- テーマ別スタイル --- */
 
-/* PSYCHEDELIC (静止画背景) */
+/* PSYCHEDELIC */
 .theme-psychedelic { 
-  background-image: url('../psychedelic-bg.png'); /* パスを修正 */
+  background-image: url('../psychedelic-bg.png'); 
   background-color: #000;
+}
+.theme-psychedelic .psy-bg {
+  position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+  background-image: inherit; background-size: cover; background-position: center;
+  opacity: 1; z-index: -2;
 }
 .theme-psychedelic .app-header h1 { 
   font-size: 1.1rem; letter-spacing: 4px; color: #fff; text-transform: uppercase;
@@ -70,13 +88,13 @@ body {
 }
 .theme-psychedelic .theme-switcher-inline button { color: #fff; border-color: rgba(255,255,255,0.5); background: rgba(0,0,0,0.4); }
 .theme-psychedelic .frequency-display {
-  width: min(70vw, 260px); aspect-ratio: 1/1; background: rgba(0, 0, 0, 0.7);
+  width: min(75vw, 280px); aspect-ratio: 1/1; background: rgba(0, 0, 0, 0.7);
   border: 2px solid rgba(255, 255, 255, 0.3); backdrop-filter: blur(12px);
-  border-radius: 50%; display: flex; flex-direction: column; align-items: center; justify-content: center; position: relative;
+  border-radius: 50%; display: flex; align-items: center; justify-content: center; position: relative;
 }
 .theme-psychedelic .note { font-size: 5rem; color: #fff; text-shadow: 0 0 20px rgba(255,255,255,0.6); }
 .theme-psychedelic .cents { color: #ffeb3b; font-size: 1.2rem; text-shadow: 1px 1px 2px #000; }
-.theme-psychedelic .frequency { color: #4fc3f7; position: absolute; bottom: 20px; font-size: 0.8rem; text-shadow: 1px 1px 2px #000; }
+.theme-psychedelic .frequency { color: #4fc3f7; font-size: 0.9rem; text-shadow: 1px 1px 2px #000; }
 .theme-psychedelic .tuner-controls button {
   background: #fff; color: #000; padding: 12px 40px; font-weight: 900;
   border-radius: 30px; box-shadow: 0 4px 15px rgba(0,0,0,0.5); text-transform: uppercase; border: none; margin-top: 15px;
@@ -86,13 +104,14 @@ body {
 .theme-classic { background: #ffffff; }
 .theme-classic .app-header h1 { font-size: 1.8rem; color: #c07b92; font-weight: bold; }
 .theme-classic .frequency-display {
-  width: 100%; height: 180px; background: linear-gradient(to bottom right, #fdf2f8, #f5f3ff);
+  width: 100%; min-height: 200px; background: linear-gradient(to bottom right, #fdf2f8, #f5f3ff);
   border-radius: 20px; box-shadow: 0 10px 25px rgba(0,0,0,0.05);
-  display: flex; flex-direction: column; align-items: center; justify-content: center; border: 1px solid rgba(0,0,0,0.05);
+  display: flex; align-items: center; justify-content: center; border: 1px solid rgba(0,0,0,0.05);
+  padding: 20px 0;
 }
 .theme-classic .note { font-size: 4.5rem; font-weight: 800; color: #7a9a8f; }
 .theme-classic .cents { font-size: 1rem; color: #f59e0b; font-weight: 600; }
-.theme-classic .frequency { margin-top: 5px; font-size: 1rem; color: #3b82f6; font-weight: 700; }
+.theme-classic .frequency { font-size: 1.1rem; color: #3b82f6; font-weight: 700; }
 .theme-classic .tuner-controls button {
   background: #ef4444; color: white; padding: 10px 45px; border-radius: 30px;
   font-size: 1.2rem; font-weight: bold; box-shadow: 0 4px 15px rgba(239, 68, 68, 0.3); border: none; margin-top: 20px;
@@ -106,11 +125,11 @@ body {
   width: min(70vw, 240px); aspect-ratio: 1/1; border-radius: 50%; background: rgba(255, 255, 255, 0.05);
   backdrop-filter: blur(20px); border: 1px solid rgba(255, 255, 255, 0.1);
   box-shadow: 0 0 40px rgba(255, 0, 255, 0.2);
-  display: flex; flex-direction: column; align-items: center; justify-content: center; position: relative;
+  display: flex; align-items: center; justify-content: center; position: relative;
 }
 .theme-neon .note { font-size: 5rem; animation: rainbow-text 4s linear infinite; }
 .theme-neon .cents { color: #00ffff; font-size: 1.2rem; }
-.theme-neon .frequency { color: rgba(255,255,255,0.5); position: absolute; bottom: 20px; font-size: 0.8rem; }
+.theme-neon .frequency { color: rgba(255,255,255,0.6); font-size: 0.9rem; }
 .theme-neon .tuner-controls button {
   background: transparent; border: 2px solid #ff00ff; color: #ff00ff;
   padding: 10px 40px; font-weight: 900; box-shadow: 0 0 15px rgba(255, 0, 255, 0.3); margin-top: 15px;

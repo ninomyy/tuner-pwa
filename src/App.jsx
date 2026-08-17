@@ -5,7 +5,7 @@ import InstallPrompt from './components/InstallPrompt'
 import './App.css'
 
 function App() {
-  const [theme, setTheme] = useState('psychedelic') // 静止画サイケをデフォルトに設定
+  const [theme, setTheme] = useState('classic')
   const {
     isListening,
     frequency,
@@ -37,15 +37,14 @@ function App() {
 
   const nextTheme = () => {
     setTheme(prev => {
+      if (prev === 'classic') return 'psychedelic';
       if (prev === 'psychedelic') return 'neon';
-      if (prev === 'neon') return 'classic';
-      return 'psychedelic';
+      return 'classic';
     });
   }
 
   return (
     <div className={`app theme-${theme} ${isListening ? 'is-listening' : ''}`}>
-      {/* 背景画像用のコンテナ */}
       <div className="psy-bg"></div>
 
       <main className="tuner-main">
@@ -65,11 +64,14 @@ function App() {
         
         <div className="frequency-display">
           <div className="note-display">
+            {/* 1. 音階表示 */}
             <span className="note">{note || '--'}</span>
+            {/* 2. セント表示 (音階のすぐ下) */}
             <span className="cents">{cents > 0 ? `+${cents}` : cents || '0'} cents</span>
-          </div>
-          <div className="frequency">
-            {frequency.toFixed(2)} Hz
+            {/* 3. 周波数表示 (セントの下) */}
+            <div className="frequency">
+              {frequency.toFixed(2)} Hz
+            </div>
           </div>
         </div>
 
